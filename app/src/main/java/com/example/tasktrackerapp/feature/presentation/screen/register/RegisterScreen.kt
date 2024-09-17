@@ -56,42 +56,14 @@ fun RegisterScreen(
     navController: NavController,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
-    val showLoading = viewModel.showLoading.value
-    val showBasicDialog = viewModel.showBasicDialog.value
-    val dialogMessage = viewModel.dialogMessage.value
+    val state = viewModel.state
 
-    //val firstName by viewModel.firstNameValue
-    //val isFirstNameValid = viewModel.isFirstNameValid.value
-    //val firstNameMessage = viewModel.firstNameMessage.value
-
-    val lastName = viewModel.lastNameValue.value
-    val isLastNameValid = viewModel.isLastNameValid.value
-    val lastNameMessage = viewModel.lastNameMessage.value
-
-    val email = viewModel.emailValue.value
-    val isEmailValid = viewModel.isEmailValid.value
-    val emailMessage = viewModel.emailMessage.value
-
-    val username = viewModel.usernameValue.value
-    val isUsernameValid = viewModel.isUserNameValid.value
-    val usernameMessage = viewModel.usernameMessage.value
-
-    val password = viewModel.passwordValue.value
-    val isPasswordValid = viewModel.isPasswordValid.value
-    val passwordMessage = viewModel.passwordMessage.value
-    val isPasswordVisible = viewModel.isPasswordVisible.value
-
-    val confirmPassword = viewModel.confirmPasswordValue.value
-    val isConfirmPasswordValid = viewModel.isConfirmPasswordValid.value
-    val confirmPasswordMessage = viewModel.confirmPasswordMessage.value
-    val isConfirmPasswordVisible = viewModel.isConfirmPasswordVisible.value
-
-    if (showLoading) {
+    if (state.value.showLoading) {
         LoadingDialog()
     }
-    if (showBasicDialog) {
+    if (state.value.showBasicDialog) {
         BasicDialog(
-            message = dialogMessage,
+            message = state.value.dialogMessage,
             onDismiss = {
                 viewModel.onEvent(RegisterEvent.SetBasicDialogVisibility(visible = false))
             },
@@ -130,7 +102,7 @@ fun RegisterScreen(
                     verticalArrangement = Arrangement.Center,
                 ) {
                     NormalTextField(
-                        value = viewModel.firstNameValue.value,
+                        value = state.value.firstNameValue,
                         onValueChange = { newVal ->
                             val text = newVal.filter { it.isLetter() || it.isWhitespace() }
                             viewModel.onEvent(RegisterEvent.FirstNameTextChanged(text))
@@ -139,11 +111,11 @@ fun RegisterScreen(
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Text,
                         ),
-                        isValid = viewModel.isFirstNameValid.value,
-                        message = viewModel.firstNameMessage.value,
+                        isValid = state.value.isFirstNameValid,
+                        message = state.value.firstNameMessage,
                     )
                     NormalTextField(
-                        value = lastName,
+                        value = state.value.lastNameValue,
                         onValueChange = { newVal ->
                             val text = newVal.filter { it.isLetter() || it.isWhitespace() }
                             viewModel.onEvent(RegisterEvent.LastNameTextChanged(text))
@@ -152,11 +124,11 @@ fun RegisterScreen(
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Text,
                         ),
-                        isValid = isLastNameValid,
-                        message = lastNameMessage,
+                        isValid = state.value.isLastNameValid,
+                        message = state.value.lastNameMessage,
                     )
                     NormalTextField(
-                        value = email,
+                        value = state.value.emailValue,
                         onValueChange = {
                             viewModel.onEvent(RegisterEvent.EmailTextChanged(it))
                         },
@@ -164,11 +136,11 @@ fun RegisterScreen(
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Email,
                         ),
-                        isValid = isEmailValid,
-                        message = emailMessage,
+                        isValid = state.value.isEmailValid,
+                        message = state.value.emailMessage,
                     )
                     NormalTextField(
-                        value = username,
+                        value = state.value.usernameValue,
                         onValueChange = { newVal ->
                             val maxLength = 20
                             val filteredText = newVal.filter { it.isLetterOrDigit() }
@@ -183,12 +155,12 @@ fun RegisterScreen(
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Ascii,
                         ),
-                        isValid = isUsernameValid,
-                        message = usernameMessage,
+                        isValid = state.value.isUserNameValid,
+                        message = state.value.usernameMessage,
                     )
                     PasswordTextField(
-                        value = password,
-                        isPasswordVisible = isPasswordVisible,
+                        value = state.value.passwordValue,
+                        isPasswordVisible = state.value.isPasswordVisible,
                         onValueChange = {
                             val maxLength = 20
                             val text = if (it.length <= maxLength) {
@@ -202,12 +174,12 @@ fun RegisterScreen(
                             viewModel.onEvent(RegisterEvent.ChangePasswordVisibility)
                         },
                         label = "Password",
-                        isValid = isPasswordValid,
-                        message = passwordMessage,
+                        isValid = state.value.isPasswordValid,
+                        message = state.value.passwordMessage,
                     )
                     PasswordTextField(
-                        value = confirmPassword,
-                        isPasswordVisible = isConfirmPasswordVisible,
+                        value = state.value.confirmPasswordValue,
+                        isPasswordVisible = state.value.isConfirmPasswordVisible,
                         onValueChange = {
                             val maxLength = 20
                             val text = if (it.length <= maxLength) {
@@ -221,8 +193,8 @@ fun RegisterScreen(
                             viewModel.onEvent(RegisterEvent.ChangeConfirmPasswordVisibility)
                         },
                         label = "Confirm Password",
-                        isValid = isConfirmPasswordValid,
-                        message = confirmPasswordMessage,
+                        isValid = state.value.isConfirmPasswordValid,
+                        message = state.value.confirmPasswordMessage,
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     Button(

@@ -18,58 +18,8 @@ import javax.inject.Inject
 class RegisterViewModel @Inject constructor(
     private val registerScreenUseCase: RegisterScreenUseCase,
 ) : ViewModel() {
-    private val _firstNameValue = mutableStateOf("")
-    val firstNameValue: State<String> = _firstNameValue
-    private val _isFirstNameValid = mutableStateOf(true)
-    val isFirstNameValid: State<Boolean> = _isFirstNameValid
-    private val _firstNameMessage = mutableStateOf("")
-    val firstNameMessage: State<String> = _firstNameMessage
-
-    private val _lastNameValue = mutableStateOf("")
-    val lastNameValue: State<String> = _lastNameValue
-    private val _isLastNameValid = mutableStateOf(true)
-    val isLastNameValid: State<Boolean> = _isLastNameValid
-    private val _lastNameMessage = mutableStateOf("")
-    val lastNameMessage: State<String> = _lastNameMessage
-
-    private val _emailValue = mutableStateOf("")
-    val emailValue: State<String> = _emailValue
-    private val _isEmailValid = mutableStateOf(true)
-    val isEmailValid: State<Boolean> = _isEmailValid
-    private val _emailMessage = mutableStateOf("")
-    val emailMessage: State<String> = _emailMessage
-
-    private val _usernameValue = mutableStateOf("")
-    val usernameValue: State<String> = _usernameValue
-    private val _isUserNameValid = mutableStateOf(true)
-    val isUserNameValid: State<Boolean> = _isUserNameValid
-    private val _usernameMessage = mutableStateOf("")
-    val usernameMessage: State<String> = _usernameMessage
-
-    private val _passwordValue = mutableStateOf("")
-    val passwordValue: State<String> = _passwordValue
-    private val _isPasswordValid = mutableStateOf(true)
-    val isPasswordValid: State<Boolean> = _isPasswordValid
-    private val _isPasswordVisible = mutableStateOf(false)
-    val isPasswordVisible: State<Boolean> = _isPasswordVisible
-    private val _passwordMessage = mutableStateOf("")
-    val passwordMessage: State<String> = _passwordMessage
-
-    private val _confirmPasswordValue = mutableStateOf("")
-    val confirmPasswordValue: State<String> = _confirmPasswordValue
-    private val _isConfirmPasswordValid = mutableStateOf(true)
-    val isConfirmPasswordValid: State<Boolean> = _isConfirmPasswordValid
-    private val _isConfirmPasswordVisible = mutableStateOf(false)
-    val isConfirmPasswordVisible: State<Boolean> = _isConfirmPasswordVisible
-    private val _confirmPasswordMessage = mutableStateOf("")
-    val confirmPasswordMessage: State<String> = _confirmPasswordMessage
-
-    private val _dialogMessage = mutableStateOf("")
-    val dialogMessage: State<String> = _dialogMessage
-    private val _showLoading = mutableStateOf(false)
-    val showLoading: State<Boolean> = _showLoading
-    private val _showBasicDialog = mutableStateOf(false)
-    val showBasicDialog: State<Boolean> = _showBasicDialog
+    private val _state = mutableStateOf(RegisterState())
+    val state: State<RegisterState> = _state
 
     fun onEvent(event: RegisterEvent) {
         when (event) {
@@ -87,62 +37,88 @@ class RegisterViewModel @Inject constructor(
     }
 
     private fun changeConfirmPasswordVisibility() {
-        _isConfirmPasswordVisible.value = !isConfirmPasswordVisible.value
+        val isVisible = !state.value.isConfirmPasswordVisible
+        _state.value = state.value.copy(
+            isConfirmPasswordVisible = isVisible
+        )
     }
 
     private fun changePasswordVisibility() {
-        _isPasswordVisible.value = !isPasswordVisible.value
+        val isVisible = !state.value.isPasswordVisible
+        _state.value = state.value.copy(
+            isPasswordVisible = isVisible,
+        )
     }
 
     private fun setConfirmPasswordValue(data: String) {
-        _confirmPasswordValue.value = data
-        _isConfirmPasswordValid.value = true
+        _state.value = state.value.copy(
+            confirmPasswordValue = data,
+            isConfirmPasswordValid = true,
+        )
     }
 
     private fun setEmailValue(data: String) {
-        _emailValue.value = data
-        _isEmailValid.value = true
+        _state.value = state.value.copy(
+            emailValue = data,
+            isEmailValid = true,
+        )
     }
 
     private fun setFirstNameValue(data: String) {
-        _firstNameValue.value = data
-        _isFirstNameValid.value = true
+        _state.value = state.value.copy(
+            firstNameValue = data,
+            isFirstNameValid = true,
+        )
     }
 
     private fun setLastNameValue(data: String) {
-        _lastNameValue.value = data
-        _isLastNameValid.value = true
+        _state.value = state.value.copy(
+            lastNameValue = data,
+            isLastNameValid = true,
+        )
     }
 
     private fun setPasswordValue(data: String) {
-        _passwordValue.value = data
-        _isPasswordValid.value = true
+        _state.value = state.value.copy(
+            passwordValue = data,
+            isPasswordValid = true,
+        )
     }
 
     private fun setUserNameValue(data: String) {
-        _usernameValue.value = data
-        _isUserNameValid.value = true
+        _state.value = state.value.copy(
+            usernameValue = data,
+            isUserNameValid = true,
+        )
     }
 
     private fun setBasicDialogState(isVisible: Boolean) {
-        _showBasicDialog.value = isVisible
+        _state.value = state.value.copy(
+            showBasicDialog = isVisible,
+        )
     }
 
     private fun onRegister() {
         val result = fieldValidations()
         if (result.isSuccess) {
             viewModelScope.launch {
-                _showLoading.value = true
+                _state.value = state.value.copy(
+                    showLoading = true,
+                )
                 when(val registerResult = registerScreenUseCase.registerUser(result.data!!)) {
                     is Either.Left -> {
-                        _showLoading.value = false
-                        _showBasicDialog.value = true
-                        _dialogMessage.value = registerResult.value
+                        _state.value = state.value.copy(
+                            showLoading = false,
+                            showBasicDialog = true,
+                            dialogMessage = registerResult.value,
+                        )
                     }
                     is Either.Right -> {
-                        _showLoading.value = false
-                        _showBasicDialog.value = true
-                        _dialogMessage.value = registerResult.value.message
+                        _state.value = state.value.copy(
+                            showLoading = false,
+                            showBasicDialog = true,
+                            dialogMessage = registerResult.value.message,
+                        )
                     }
                 }
             }
@@ -151,87 +127,125 @@ class RegisterViewModel @Inject constructor(
 
     private fun fieldValidations(): ResultModel<UserModel> {
         var isValidated = true
-        val firstName = Utility.capitalizedInitialLetter(_firstNameValue.value.trim())
-        val lastName = Utility.capitalizedInitialLetter(_lastNameValue.value.trim())
-        val email = _emailValue.value.trim()
-        val userName = _usernameValue.value.trim()
-        val password = _passwordValue.value.trim()
-        val confirmPassword = _confirmPasswordValue.value.trim()
+        val firstName = Utility.capitalizedInitialLetter(_state.value.firstNameValue.trim())
+        val lastName = Utility.capitalizedInitialLetter(_state.value.lastNameValue.trim())
+        val email = _state.value.emailValue.trim()
+        val userName = _state.value.usernameValue.trim()
+        val password = _state.value.passwordValue.trim()
+        val confirmPassword = _state.value.confirmPasswordValue.trim()
 
         if (firstName.isBlank() || firstName.isEmpty()) {
             isValidated = false
-            _isFirstNameValid.value = false
-            _firstNameMessage.value = "Field is empty"
+            _state.value = state.value.copy(
+                isFirstNameValid = false,
+                firstNameMessage = "Field is empty",
+            )
         } else {
-            _isFirstNameValid.value = true
+            _state.value = state.value.copy(
+                isFirstNameValid = true,
+            )
         }
 
         if (lastName.isBlank() || lastName.isEmpty()) {
             isValidated = false
-            _isLastNameValid.value = false
-            _lastNameMessage.value = "Field is empty"
+            _state.value = state.value.copy(
+                isLastNameValid = false,
+                lastNameMessage = "Field is empty",
+            )
         } else {
-            _isLastNameValid.value = true
+            _state.value = state.value.copy(
+                isLastNameValid = true,
+            )
         }
 
         if (email.isBlank() || email.isEmpty()) {
             isValidated = false
-            _isEmailValid.value = false
-            _emailMessage.value = "Field is empty"
+            _state.value = state.value.copy(
+                isEmailValid = false,
+                emailMessage = "Field is empty",
+            )
         } else if (!Utility.isValidEmail(email)) {
             isValidated = false
-            _isEmailValid.value = false
-            _emailMessage.value = "Enter a valid email address"
+            _state.value = state.value.copy(
+                isEmailValid = false,
+                emailMessage = "Enter a valid email address",
+            )
         } else {
-            _isEmailValid.value = true
+            _state.value = state.value.copy(
+                isEmailValid = true,
+            )
         }
 
         if (userName.isBlank() || userName.isEmpty()) {
             isValidated = false
-            _isUserNameValid.value = false
-            _usernameMessage.value = "Field is empty"
+            _state.value = state.value.copy(
+                isUserNameValid = false,
+                usernameMessage = "Field is empty",
+            )
         } else {
-            _isUserNameValid.value = true
+            _state.value = state.value.copy(
+                isUserNameValid = true,
+            )
         }
 
         if (password.isBlank() || password.isEmpty()) {
             isValidated = false
-            _isPasswordValid.value = false
-            _passwordMessage.value = "Field is empty"
+            _state.value = state.value.copy(
+                isPasswordValid = false,
+                passwordMessage = "Field is empty",
+            )
         } else if (password.length < 7) {
             isValidated = false
-            _isPasswordValid.value = false
-            _passwordMessage.value = "Password must be minimum of 7 characters"
+            _state.value = state.value.copy(
+                isPasswordValid = false,
+                passwordMessage = "Password must be minimum of 7 characters",
+            )
         } else if (!password.any { it.isLowerCase() }) {
             isValidated = false
-            _isPasswordValid.value = false
-            _passwordMessage.value = "Password must include at least 1 lowercase letter"
+            _state.value = state.value.copy(
+                isPasswordValid = false,
+                passwordMessage = "Password must include at least 1 lowercase letter",
+            )
         } else if (!password.any { it.isUpperCase() }) {
             isValidated = false
-            _isPasswordValid.value = false
-            _passwordMessage.value = "Password must include at least 1 uppercase letter"
+            _state.value = state.value.copy(
+                isPasswordValid = false,
+                passwordMessage = "Password must include at least 1 uppercase letter",
+            )
         } else if (!password.any { it.isDigit() }) {
             isValidated = false
-            _isPasswordValid.value = false
-            _passwordMessage.value = "Password must include at least 1 number"
+            _state.value = state.value.copy(
+                isPasswordValid = false,
+                passwordMessage = "Password must include at least 1 number",
+            )
         } else if (password.all { it.isLetterOrDigit() }) {
             isValidated = false
-            _isPasswordValid.value = false
-            _passwordMessage.value = "Password must include at least 1 special character"
+            _state.value = state.value.copy(
+                isPasswordValid = false,
+                passwordMessage = "Password must include at least 1 special character",
+            )
         } else {
-            _isPasswordValid.value = true
+            _state.value = state.value.copy(
+                isPasswordValid = true,
+            )
         }
 
         if (confirmPassword.isBlank() || confirmPassword.isEmpty()) {
             isValidated = false
-            _isConfirmPasswordValid.value = false
-            _confirmPasswordMessage.value = "Field is empty"
+            _state.value = state.value.copy(
+                isConfirmPasswordValid = false,
+                confirmPasswordMessage = "Field is empty",
+            )
         } else if (confirmPassword != password) {
             isValidated = false
-            _isConfirmPasswordValid.value = false
-            _confirmPasswordMessage.value = "Confirm Password does not matched"
+            _state.value = state.value.copy(
+                isConfirmPasswordValid = false,
+                confirmPasswordMessage = "Confirm Password does not matched",
+            )
         } else {
-            _isConfirmPasswordValid.value = true
+            _state.value = state.value.copy(
+                isConfirmPasswordValid = true,
+            )
         }
 
         if (isValidated) {

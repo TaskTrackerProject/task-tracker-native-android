@@ -1,0 +1,27 @@
+package com.example.tasktrackerapp.feature.presentation.screen.register
+
+data class RegisterState(
+    val firstNameValue: String = "",
+    val isFirstNameValid: Boolean = true,
+    val firstNameMessage: String = "",
+    val lastNameValue: String = "",
+    val isLastNameValid: Boolean = true,
+    val lastNameMessage: String = "",
+    val emailValue: String = "",
+    val isEmailValid: Boolean = true,
+    val emailMessage: String = "",
+    val usernameValue: String = "",
+    val isUserNameValid: Boolean = true,
+    val usernameMessage: String = "",
+    val passwordValue: String = "",
+    val isPasswordValid: Boolean = true,
+    val isPasswordVisible: Boolean = false,
+    val passwordMessage: String = "",
+    val confirmPasswordValue: String = "",
+    val isConfirmPasswordValid: Boolean = true,
+    val isConfirmPasswordVisible: Boolean = false,
+    val confirmPasswordMessage: String = "",
+    val dialogMessage: String = "",
+    val showLoading: Boolean = false,
+    val showBasicDialog: Boolean = false,
+)
