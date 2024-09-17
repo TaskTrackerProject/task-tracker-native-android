@@ -1,4 +1,4 @@
-package com.example.tasktrackerapp.feature.domain.usecase.user
+package com.example.tasktrackerapp.feature.domain.usecase.register
 
 import com.example.tasktrackerapp.core.model.Either
 import com.example.tasktrackerapp.core.model.SuccessModel

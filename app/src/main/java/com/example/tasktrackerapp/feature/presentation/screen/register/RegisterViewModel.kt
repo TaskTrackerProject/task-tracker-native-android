@@ -5,20 +5,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tasktrackerapp.core.model.Either
-import com.example.tasktrackerapp.core.model.ResultModel
 import com.example.tasktrackerapp.core.utils.UIText
-import com.example.tasktrackerapp.core.utils.Utility
 import com.example.tasktrackerapp.feature.domain.model.UserModel
-import com.example.tasktrackerapp.feature.domain.usecase.RegisterScreenUseCase
+import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.example.tasktrackerapp.R
 import com.example.tasktrackerapp.core.constants.AppConstants
+import com.example.tasktrackerapp.core.model.ResultModel
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val registerScreenUseCase: RegisterScreenUseCase,
+    private val registerUseCase: RegisterUseCase,
 ) : ViewModel() {
     private val _state = mutableStateOf(RegisterState())
     val state: State<RegisterState> = _state
@@ -123,14 +121,112 @@ class RegisterViewModel @Inject constructor(
         )
     }
 
+    private fun validate(): ResultModel<Any> {
+        var isSuccess = true
+
+        val firstNameResult =
+            registerUseCase.validateEmptyField(_state.value.firstNameValue)
+        if (!firstNameResult.isSuccess) {
+            isSuccess = false
+            _state.value = state.value.copy(
+                isFirstNameValid = false,
+                firstNameMessage = firstNameResult.message,
+            )
+        } else {
+            _state.value = state.value.copy(
+                isFirstNameValid = true
+            )
+        }
+
+        val lastNameResult =
+            registerUseCase.validateEmptyField(_state.value.lastNameValue)
+        if (!lastNameResult.isSuccess) {
+            isSuccess = false
+            _state.value = state.value.copy(
+                isLastNameValid = false,
+                lastNameMessage = lastNameResult.message,
+            )
+        } else {
+            _state.value = state.value.copy(
+                isLastNameValid = true
+            )
+        }
+
+        val emailResult = registerUseCase.validateEmail(_state.value.emailValue)
+        if (!emailResult.isSuccess) {
+            isSuccess = false
+            _state.value = state.value.copy(
+                isEmailValid = false,
+                emailMessage = emailResult.message,
+            )
+        } else {
+            _state.value = state.value.copy(
+                isEmailValid = true
+            )
+        }
+
+        val usernameResult =
+            registerUseCase.validateEmptyField(_state.value.usernameValue)
+        if (!usernameResult.isSuccess) {
+            isSuccess = false
+            _state.value = state.value.copy(
+                isUserNameValid = false,
+                usernameMessage = usernameResult.message,
+            )
+        } else {
+            _state.value = state.value.copy(
+                isUserNameValid = true
+            )
+        }
+
+        val passwordResult = registerUseCase.validatePassword(_state.value.passwordValue)
+        if (!passwordResult.isSuccess) {
+            isSuccess = false
+            _state.value = state.value.copy(
+                isPasswordValid = false,
+                passwordMessage = passwordResult.message,
+            )
+        } else {
+            _state.value = state.value.copy(
+                isPasswordValid = true
+            )
+        }
+
+        val confirmPasswordResult =
+            registerUseCase.validateConfirmPassword(
+                _state.value.passwordValue,
+                _state.value.confirmPasswordValue,
+            )
+        if (!confirmPasswordResult.isSuccess) {
+            isSuccess = false
+            _state.value = state.value.copy(
+                isConfirmPasswordValid = false,
+                confirmPasswordMessage = confirmPasswordResult.message,
+            )
+        } else {
+            _state.value = state.value.copy(
+                isConfirmPasswordValid = true
+            )
+        }
+
+        return ResultModel(isSuccess = isSuccess)
+    }
+
     private fun onRegister() {
-        val result = fieldValidations()
-        if (result.isSuccess) {
-            viewModelScope.launch {
-                _state.value = state.value.copy(
-                    showLoading = true,
+        viewModelScope.launch {
+            _state.value = state.value.copy(
+                showLoading = true,
+            )
+
+            if (validate().isSuccess) {
+                val param = UserModel(
+                    firstName = _state.value.firstNameValue,
+                    lastName = _state.value.lastNameValue,
+                    email = _state.value.emailValue,
+                    userName = _state.value.usernameValue,
+                    password = _state.value.passwordValue,
                 )
-                when (val registerResult = registerScreenUseCase.registerUser(result.data!!)) {
+                when (val registerResult = registerUseCase.registerUser(param)) {
                     is Either.Left -> {
                         _state.value = state.value.copy(
                             showLoading = false,
@@ -143,155 +239,15 @@ class RegisterViewModel @Inject constructor(
                         _state.value = state.value.copy(
                             showLoading = false,
                             showBasicDialog = true,
-                            dialogMessage = UIText.DynamicString(registerResult.value.message),
+                            dialogMessage = registerResult.value.message,
                         )
                     }
                 }
-            }
-        }
-    }
-
-    private fun fieldValidations(): ResultModel<UserModel> {
-        var isValidated = true
-        val firstName = Utility.capitalizedInitialLetter(_state.value.firstNameValue.trim())
-        val lastName = Utility.capitalizedInitialLetter(_state.value.lastNameValue.trim())
-        val email = _state.value.emailValue.trim()
-        val userName = _state.value.usernameValue.trim()
-        val password = _state.value.passwordValue.trim()
-        val confirmPassword = _state.value.confirmPasswordValue.trim()
-
-        if (firstName.isBlank() || firstName.isEmpty()) {
-            isValidated = false
-            _state.value = state.value.copy(
-                isFirstNameValid = false,
-                firstNameMessage = UIText.StringResource(R.string.field_is_empty),
-            )
-        } else {
-            _state.value = state.value.copy(
-                isFirstNameValid = true,
-            )
-        }
-
-        if (lastName.isBlank() || lastName.isEmpty()) {
-            isValidated = false
-            _state.value = state.value.copy(
-                isLastNameValid = false,
-                lastNameMessage = UIText.StringResource(R.string.field_is_empty),
-            )
-        } else {
-            _state.value = state.value.copy(
-                isLastNameValid = true,
-            )
-        }
-
-        if (email.isBlank() || email.isEmpty()) {
-            isValidated = false
-            _state.value = state.value.copy(
-                isEmailValid = false,
-                emailMessage = UIText.StringResource(R.string.field_is_empty),
-            )
-        } else if (!Utility.isValidEmail(email)) {
-            isValidated = false
-            _state.value = state.value.copy(
-                isEmailValid = false,
-                emailMessage = UIText.StringResource(R.string.enter_valid_email_add),
-            )
-        } else {
-            _state.value = state.value.copy(
-                isEmailValid = true,
-            )
-        }
-
-        if (userName.isBlank() || userName.isEmpty()) {
-            isValidated = false
-            _state.value = state.value.copy(
-                isUserNameValid = false,
-                usernameMessage = UIText.StringResource(R.string.field_is_empty),
-            )
-        } else {
-            _state.value = state.value.copy(
-                isUserNameValid = true,
-            )
-        }
-
-        if (password.isBlank() || password.isEmpty()) {
-            isValidated = false
-            _state.value = state.value.copy(
-                isPasswordValid = false,
-                passwordMessage = UIText.StringResource(R.string.field_is_empty),
-            )
-        } else if (password.length < 7) {
-            isValidated = false
-            _state.value = state.value.copy(
-                isPasswordValid = false,
-                passwordMessage = UIText.StringResource(
-                    R.string.password_min_char,
-                    AppConstants.PASSWORD_MIN_LEN,
-                ),
-            )
-        } else if (!password.any { it.isLowerCase() }) {
-            isValidated = false
-            _state.value = state.value.copy(
-                isPasswordValid = false,
-                passwordMessage = UIText.StringResource(R.string.password_include_lowercase),
-            )
-        } else if (!password.any { it.isUpperCase() }) {
-            isValidated = false
-            _state.value = state.value.copy(
-                isPasswordValid = false,
-                passwordMessage = UIText.StringResource(R.string.password_include_uppercase),
-            )
-        } else if (!password.any { it.isDigit() }) {
-            isValidated = false
-            _state.value = state.value.copy(
-                isPasswordValid = false,
-                passwordMessage = UIText.StringResource(R.string.password_include_number),
-            )
-        } else if (password.all { it.isLetterOrDigit() }) {
-            isValidated = false
-            _state.value = state.value.copy(
-                isPasswordValid = false,
-                passwordMessage = UIText.StringResource(R.string.password_include_special_char),
-            )
-        } else {
-            _state.value = state.value.copy(
-                isPasswordValid = true,
-            )
-        }
-
-        if (confirmPassword.isBlank() || confirmPassword.isEmpty()) {
-            isValidated = false
-            _state.value = state.value.copy(
-                isConfirmPasswordValid = false,
-                confirmPasswordMessage = UIText.StringResource(R.string.field_is_empty),
-            )
-        } else if (confirmPassword != password) {
-            isValidated = false
-            _state.value = state.value.copy(
-                isConfirmPasswordValid = false,
-                confirmPasswordMessage = UIText.StringResource(R.string.confirm_pass_not_match),
-            )
-        } else {
-            _state.value = state.value.copy(
-                isConfirmPasswordValid = true,
-            )
-        }
-
-        if (isValidated) {
-            return ResultModel(
-                isSuccess = true,
-                data = UserModel(
-                    firstName = firstName,
-                    lastName = lastName,
-                    email = email,
-                    userName = userName,
-                    password = password,
+            } else {
+                _state.value = state.value.copy(
+                    showLoading = false,
                 )
-            )
-        } else {
-            return ResultModel(
-                isSuccess = false,
-            )
+            }
         }
     }
 }

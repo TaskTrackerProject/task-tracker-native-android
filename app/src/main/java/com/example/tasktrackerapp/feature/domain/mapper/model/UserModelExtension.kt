@@ -1,4 +1,4 @@
-package com.example.tasktrackerapp.feature.domain.mapper
+package com.example.tasktrackerapp.feature.domain.mapper.model
 
 import com.example.tasktrackerapp.feature.domain.entity.remote.user.UserRegisterPayloadEntity
 import com.example.tasktrackerapp.feature.domain.model.UserModel

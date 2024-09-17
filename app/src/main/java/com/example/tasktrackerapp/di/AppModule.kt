@@ -6,8 +6,12 @@ import com.example.tasktrackerapp.feature.data.datasource.remote.UserDataSource
 import com.example.tasktrackerapp.feature.data.datasource.remote.UserDataSourceImpl
 import com.example.tasktrackerapp.feature.data.repository.UserRepositoryImpl
 import com.example.tasktrackerapp.feature.domain.repository.UserRepository
-import com.example.tasktrackerapp.feature.domain.usecase.RegisterScreenUseCase
-import com.example.tasktrackerapp.feature.domain.usecase.user.RegisterUser
+import com.example.tasktrackerapp.feature.domain.usecase.ValidateEmptyField
+import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterUseCase
+import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterUser
+import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValidateConfirmPassword
+import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValidateEmail
+import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValidatePassword
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -69,9 +73,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRegisterScreenUseCase(userRepository: UserRepository) : RegisterScreenUseCase {
-        return RegisterScreenUseCase(
-            registerUser = RegisterUser(userRepository)
+    fun provideRegisterScreenUseCase(userRepository: UserRepository) : RegisterUseCase {
+        return RegisterUseCase(
+            registerUser = RegisterUser(userRepository),
+            validateEmail = RegisterValidateEmail(),
+            validatePassword = RegisterValidatePassword(),
+            validateConfirmPassword = RegisterValidateConfirmPassword(),
+            validateEmptyField = ValidateEmptyField(),
         )
     }
 }

@@ -2,9 +2,10 @@ package com.example.tasktrackerapp.feature.data.repository
 
 import com.example.tasktrackerapp.core.model.Either
 import com.example.tasktrackerapp.feature.data.datasource.remote.UserDataSource
-import com.example.tasktrackerapp.feature.domain.mapper.toUserRegisterPayloadEntity
+import com.example.tasktrackerapp.feature.domain.mapper.model.toUserRegisterPayloadEntity
 import com.example.tasktrackerapp.feature.domain.model.UserModel
 import com.example.tasktrackerapp.core.model.SuccessModel
+import com.example.tasktrackerapp.core.utils.UIText
 import com.example.tasktrackerapp.feature.domain.repository.UserRepository
 import javax.inject.Inject
 
@@ -19,7 +20,9 @@ class UserRepositoryImpl @Inject constructor(
                 val userId = result.body()?.data?.id ?: ""
                 Either.Right(
                     value = SuccessModel(
-                        message = result.body()!!.message ?: "Registration success",
+                        message = UIText.DynamicString(
+                            result.body()!!.message ?: "Registration success"
+                        ),
                         data = userId,
                     ),
                 )

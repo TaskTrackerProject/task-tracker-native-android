@@ -25,6 +25,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
@@ -53,6 +55,7 @@ fun RegisterScreen(
     if (state.value.showLoading) {
         LoadingDialog()
     }
+
     if (state.value.showBasicDialog) {
         BasicDialog(
             message = (state.value.dialogMessage.asString(context)),
@@ -64,6 +67,7 @@ fun RegisterScreen(
             }
         )
     }
+
     Scaffold(
         modifier = Modifier.imePadding(),
         topBar = {
