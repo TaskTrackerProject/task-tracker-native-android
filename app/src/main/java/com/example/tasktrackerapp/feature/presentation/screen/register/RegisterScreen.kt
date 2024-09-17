@@ -1,11 +1,8 @@
 package com.example.tasktrackerapp.feature.presentation.screen.register
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,8 +13,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -28,14 +23,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -44,11 +35,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.tasktrackerapp.R
+import com.example.tasktrackerapp.core.constants.AppConstants
+import com.example.tasktrackerapp.core.utils.UIText
 import com.example.tasktrackerapp.feature.presentation.components.BasicDialog
 import com.example.tasktrackerapp.feature.presentation.components.LoadingDialog
-import com.example.tasktrackerapp.feature.presentation.components.rememberImeState
-import com.example.tasktrackerapp.feature.presentation.screen.login.LoginEvent
-import com.example.tasktrackerapp.feature.presentation.screen.login.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,13 +48,14 @@ fun RegisterScreen(
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
     val state = viewModel.state
+    val context = LocalContext.current
 
     if (state.value.showLoading) {
         LoadingDialog()
     }
     if (state.value.showBasicDialog) {
         BasicDialog(
-            message = state.value.dialogMessage,
+            message = (state.value.dialogMessage.asString(context)),
             onDismiss = {
                 viewModel.onEvent(RegisterEvent.SetBasicDialogVisibility(visible = false))
             },
@@ -77,7 +69,9 @@ fun RegisterScreen(
         modifier = Modifier.imePadding(),
         topBar = {
             TopAppBar(
-                title = { Text(text = "Register") },
+                title = {
+                    Text(text = UIText.StringResource(R.string.register).asString(context))
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -107,12 +101,12 @@ fun RegisterScreen(
                             val text = newVal.filter { it.isLetter() || it.isWhitespace() }
                             viewModel.onEvent(RegisterEvent.FirstNameTextChanged(text))
                         },
-                        label = "First Name",
+                        label = UIText.StringResource(R.string.first_name).asString(context),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Text,
                         ),
                         isValid = state.value.isFirstNameValid,
-                        message = state.value.firstNameMessage,
+                        message = state.value.firstNameMessage.asString(context),
                     )
                     NormalTextField(
                         value = state.value.lastNameValue,
@@ -120,29 +114,29 @@ fun RegisterScreen(
                             val text = newVal.filter { it.isLetter() || it.isWhitespace() }
                             viewModel.onEvent(RegisterEvent.LastNameTextChanged(text))
                         },
-                        label = "Last Name",
+                        label = UIText.StringResource(R.string.last_name).asString(context),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Text,
                         ),
                         isValid = state.value.isLastNameValid,
-                        message = state.value.lastNameMessage,
+                        message = state.value.lastNameMessage.asString(context),
                     )
                     NormalTextField(
                         value = state.value.emailValue,
                         onValueChange = {
                             viewModel.onEvent(RegisterEvent.EmailTextChanged(it))
                         },
-                        label = "Email",
+                        label = UIText.StringResource(R.string.email).asString(context),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Email,
                         ),
                         isValid = state.value.isEmailValid,
-                        message = state.value.emailMessage,
+                        message = state.value.emailMessage.asString(context),
                     )
                     NormalTextField(
                         value = state.value.usernameValue,
                         onValueChange = { newVal ->
-                            val maxLength = 20
+                            val maxLength = AppConstants.USERNAME_MAX_LEN
                             val filteredText = newVal.filter { it.isLetterOrDigit() }
                             val text = if (filteredText.length <= maxLength) {
                                 filteredText
@@ -151,18 +145,18 @@ fun RegisterScreen(
                             }
                             viewModel.onEvent(RegisterEvent.UserNameTextChanged(text))
                         },
-                        label = "Username",
+                        label = UIText.StringResource(R.string.username).asString(context),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Ascii,
                         ),
                         isValid = state.value.isUserNameValid,
-                        message = state.value.usernameMessage,
+                        message = state.value.usernameMessage.asString(context),
                     )
                     PasswordTextField(
                         value = state.value.passwordValue,
                         isPasswordVisible = state.value.isPasswordVisible,
                         onValueChange = {
-                            val maxLength = 20
+                            val maxLength = AppConstants.PASSWORD_MAX_LEN
                             val text = if (it.length <= maxLength) {
                                 it
                             } else {
@@ -173,15 +167,15 @@ fun RegisterScreen(
                         onTrailIconPress = {
                             viewModel.onEvent(RegisterEvent.ChangePasswordVisibility)
                         },
-                        label = "Password",
+                        label = UIText.StringResource(R.string.password).asString(context),
                         isValid = state.value.isPasswordValid,
-                        message = state.value.passwordMessage,
+                        message = state.value.passwordMessage.asString(context),
                     )
                     PasswordTextField(
                         value = state.value.confirmPasswordValue,
                         isPasswordVisible = state.value.isConfirmPasswordVisible,
                         onValueChange = {
-                            val maxLength = 20
+                            val maxLength = AppConstants.USERNAME_MAX_LEN
                             val text = if (it.length <= maxLength) {
                                 it
                             } else {
@@ -192,9 +186,9 @@ fun RegisterScreen(
                         onTrailIconPress = {
                             viewModel.onEvent(RegisterEvent.ChangeConfirmPasswordVisibility)
                         },
-                        label = "Confirm Password",
+                        label = UIText.StringResource(R.string.confirm_password).asString(context),
                         isValid = state.value.isConfirmPasswordValid,
-                        message = state.value.confirmPasswordMessage,
+                        message = state.value.confirmPasswordMessage.asString(context),
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     Button(
@@ -203,7 +197,9 @@ fun RegisterScreen(
                             viewModel.onEvent(RegisterEvent.OnRegisterPress)
                         }
                     ) {
-                        Text("REGISTER")
+                        Text(
+                            UIText.StringResource(R.string.register).asString(context).uppercase(),
+                        )
                     }
                 }
             }

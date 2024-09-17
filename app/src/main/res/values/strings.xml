@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">TaskTrackerApp</string>
+    <string name="register">Register</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="username">Username</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="field_is_empty">Field is empty</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="enter_valid_email_add">Enter a valid email address</string>
+    <string name="password_min_char">Password must be minimum of %d characters</string>
+    <string name="password_include_lowercase">Password must include at least 1 lowercase letter</string>
+    <string name="password_include_uppercase">Password must include at least 1 uppercase letter</string>
+    <string name="password_include_number">Password must include at least 1 number</string>
+    <string name="password_include_special_char">Password must include at least 1 special character</string>
+    <string name="confirm_pass_not_match">Confirm Password does not matched</string>
 </resources>

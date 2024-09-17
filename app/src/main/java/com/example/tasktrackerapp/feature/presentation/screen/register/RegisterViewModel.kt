@@ -4,15 +4,17 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tasktrackerapp.core.model.Either
 import com.example.tasktrackerapp.core.model.ResultModel
+import com.example.tasktrackerapp.core.utils.UIText
 import com.example.tasktrackerapp.core.utils.Utility
 import com.example.tasktrackerapp.feature.domain.model.UserModel
 import com.example.tasktrackerapp.feature.domain.usecase.RegisterScreenUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.tasktrackerapp.R
+import com.example.tasktrackerapp.core.constants.AppConstants
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
@@ -105,19 +107,20 @@ class RegisterViewModel @Inject constructor(
                 _state.value = state.value.copy(
                     showLoading = true,
                 )
-                when(val registerResult = registerScreenUseCase.registerUser(result.data!!)) {
+                when (val registerResult = registerScreenUseCase.registerUser(result.data!!)) {
                     is Either.Left -> {
                         _state.value = state.value.copy(
                             showLoading = false,
                             showBasicDialog = true,
-                            dialogMessage = registerResult.value,
+                            dialogMessage = UIText.DynamicString(registerResult.value),
                         )
                     }
+
                     is Either.Right -> {
                         _state.value = state.value.copy(
                             showLoading = false,
                             showBasicDialog = true,
-                            dialogMessage = registerResult.value.message,
+                            dialogMessage = UIText.DynamicString(registerResult.value.message),
                         )
                     }
                 }
@@ -138,7 +141,7 @@ class RegisterViewModel @Inject constructor(
             isValidated = false
             _state.value = state.value.copy(
                 isFirstNameValid = false,
-                firstNameMessage = "Field is empty",
+                firstNameMessage = UIText.StringResource(R.string.field_is_empty),
             )
         } else {
             _state.value = state.value.copy(
@@ -150,7 +153,7 @@ class RegisterViewModel @Inject constructor(
             isValidated = false
             _state.value = state.value.copy(
                 isLastNameValid = false,
-                lastNameMessage = "Field is empty",
+                lastNameMessage = UIText.StringResource(R.string.field_is_empty),
             )
         } else {
             _state.value = state.value.copy(
@@ -162,13 +165,13 @@ class RegisterViewModel @Inject constructor(
             isValidated = false
             _state.value = state.value.copy(
                 isEmailValid = false,
-                emailMessage = "Field is empty",
+                emailMessage = UIText.StringResource(R.string.field_is_empty),
             )
         } else if (!Utility.isValidEmail(email)) {
             isValidated = false
             _state.value = state.value.copy(
                 isEmailValid = false,
-                emailMessage = "Enter a valid email address",
+                emailMessage = UIText.StringResource(R.string.enter_valid_email_add),
             )
         } else {
             _state.value = state.value.copy(
@@ -180,7 +183,7 @@ class RegisterViewModel @Inject constructor(
             isValidated = false
             _state.value = state.value.copy(
                 isUserNameValid = false,
-                usernameMessage = "Field is empty",
+                usernameMessage = UIText.StringResource(R.string.field_is_empty),
             )
         } else {
             _state.value = state.value.copy(
@@ -192,37 +195,40 @@ class RegisterViewModel @Inject constructor(
             isValidated = false
             _state.value = state.value.copy(
                 isPasswordValid = false,
-                passwordMessage = "Field is empty",
+                passwordMessage = UIText.StringResource(R.string.field_is_empty),
             )
         } else if (password.length < 7) {
             isValidated = false
             _state.value = state.value.copy(
                 isPasswordValid = false,
-                passwordMessage = "Password must be minimum of 7 characters",
+                passwordMessage = UIText.StringResource(
+                    R.string.password_min_char,
+                    AppConstants.PASSWORD_MIN_LEN,
+                ),
             )
         } else if (!password.any { it.isLowerCase() }) {
             isValidated = false
             _state.value = state.value.copy(
                 isPasswordValid = false,
-                passwordMessage = "Password must include at least 1 lowercase letter",
+                passwordMessage = UIText.StringResource(R.string.password_include_lowercase),
             )
         } else if (!password.any { it.isUpperCase() }) {
             isValidated = false
             _state.value = state.value.copy(
                 isPasswordValid = false,
-                passwordMessage = "Password must include at least 1 uppercase letter",
+                passwordMessage = UIText.StringResource(R.string.password_include_uppercase),
             )
         } else if (!password.any { it.isDigit() }) {
             isValidated = false
             _state.value = state.value.copy(
                 isPasswordValid = false,
-                passwordMessage = "Password must include at least 1 number",
+                passwordMessage = UIText.StringResource(R.string.password_include_number),
             )
         } else if (password.all { it.isLetterOrDigit() }) {
             isValidated = false
             _state.value = state.value.copy(
                 isPasswordValid = false,
-                passwordMessage = "Password must include at least 1 special character",
+                passwordMessage = UIText.StringResource(R.string.password_include_special_char),
             )
         } else {
             _state.value = state.value.copy(
@@ -234,13 +240,13 @@ class RegisterViewModel @Inject constructor(
             isValidated = false
             _state.value = state.value.copy(
                 isConfirmPasswordValid = false,
-                confirmPasswordMessage = "Field is empty",
+                confirmPasswordMessage = UIText.StringResource(R.string.field_is_empty),
             )
         } else if (confirmPassword != password) {
             isValidated = false
             _state.value = state.value.copy(
                 isConfirmPasswordValid = false,
-                confirmPasswordMessage = "Confirm Password does not matched",
+                confirmPasswordMessage = UIText.StringResource(R.string.confirm_pass_not_match),
             )
         } else {
             _state.value = state.value.copy(
@@ -259,8 +265,7 @@ class RegisterViewModel @Inject constructor(
                     password = password,
                 )
             )
-        }
-        else {
+        } else {
             return ResultModel(
                 isSuccess = false,
             )
