@@ -62,19 +62,3 @@ class MainActivity : ComponentActivity() {
 fun AppEntryPoint() {
     AppNavigationGraph()
 }
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TaskTrackerAppTheme {
-        Greeting("Android")
-    }
-}
