@@ -53,8 +53,15 @@ class RegisterViewModel @Inject constructor(
     }
 
     private fun setConfirmPasswordValue(data: String) {
+        val maxLength = AppConstants.USERNAME_MAX_LEN
+        val filteredText = data.filter { it.isLetterOrDigit() }
+        val text = if (filteredText.length <= maxLength) {
+            filteredText
+        } else {
+            filteredText.take(maxLength)
+        }
         _state.value = state.value.copy(
-            confirmPasswordValue = data,
+            confirmPasswordValue = text,
             isConfirmPasswordValid = true,
         )
     }
@@ -67,29 +74,45 @@ class RegisterViewModel @Inject constructor(
     }
 
     private fun setFirstNameValue(data: String) {
+        val text = data.filter { it.isLetter() || it.isWhitespace() }
         _state.value = state.value.copy(
-            firstNameValue = data,
+            firstNameValue = text,
             isFirstNameValid = true,
         )
     }
 
     private fun setLastNameValue(data: String) {
+        val text = data.filter { it.isLetter() || it.isWhitespace() }
         _state.value = state.value.copy(
-            lastNameValue = data,
+            lastNameValue = text,
             isLastNameValid = true,
         )
     }
 
     private fun setPasswordValue(data: String) {
+        val maxLength = AppConstants.PASSWORD_MAX_LEN
+        val filteredText = data.filter { it.isLetterOrDigit() }
+        val text = if (filteredText.length <= maxLength) {
+            filteredText
+        } else {
+            filteredText.take(maxLength)
+        }
         _state.value = state.value.copy(
-            passwordValue = data,
+            passwordValue = text,
             isPasswordValid = true,
         )
     }
 
     private fun setUserNameValue(data: String) {
+        val maxLength = AppConstants.USERNAME_MAX_LEN
+        val filteredText = data.filter { it.isLetterOrDigit() }
+        val text = if (filteredText.length <= maxLength) {
+            filteredText
+        } else {
+            filteredText.take(maxLength)
+        }
         _state.value = state.value.copy(
-            usernameValue = data,
+            usernameValue = text,
             isUserNameValid = true,
         )
     }

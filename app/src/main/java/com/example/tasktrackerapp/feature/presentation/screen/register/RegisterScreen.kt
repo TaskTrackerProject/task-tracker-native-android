@@ -64,7 +64,6 @@ fun RegisterScreen(
             }
         )
     }
-
     Scaffold(
         modifier = Modifier.imePadding(),
         topBar = {
@@ -97,9 +96,8 @@ fun RegisterScreen(
                 ) {
                     NormalTextField(
                         value = state.value.firstNameValue,
-                        onValueChange = { newVal ->
-                            val text = newVal.filter { it.isLetter() || it.isWhitespace() }
-                            viewModel.onEvent(RegisterEvent.FirstNameTextChanged(text))
+                        onValueChange = {
+                            viewModel.onEvent(RegisterEvent.FirstNameTextChanged(it))
                         },
                         label = UIText.StringResource(R.string.first_name).asString(context),
                         keyboardOptions = KeyboardOptions.Default.copy(
@@ -110,9 +108,8 @@ fun RegisterScreen(
                     )
                     NormalTextField(
                         value = state.value.lastNameValue,
-                        onValueChange = { newVal ->
-                            val text = newVal.filter { it.isLetter() || it.isWhitespace() }
-                            viewModel.onEvent(RegisterEvent.LastNameTextChanged(text))
+                        onValueChange = {
+                            viewModel.onEvent(RegisterEvent.LastNameTextChanged(it))
                         },
                         label = UIText.StringResource(R.string.last_name).asString(context),
                         keyboardOptions = KeyboardOptions.Default.copy(
@@ -135,15 +132,8 @@ fun RegisterScreen(
                     )
                     NormalTextField(
                         value = state.value.usernameValue,
-                        onValueChange = { newVal ->
-                            val maxLength = AppConstants.USERNAME_MAX_LEN
-                            val filteredText = newVal.filter { it.isLetterOrDigit() }
-                            val text = if (filteredText.length <= maxLength) {
-                                filteredText
-                            } else {
-                                filteredText.take(maxLength)
-                            }
-                            viewModel.onEvent(RegisterEvent.UserNameTextChanged(text))
+                        onValueChange = {
+                            viewModel.onEvent(RegisterEvent.UserNameTextChanged(it))
                         },
                         label = UIText.StringResource(R.string.username).asString(context),
                         keyboardOptions = KeyboardOptions.Default.copy(
@@ -156,13 +146,7 @@ fun RegisterScreen(
                         value = state.value.passwordValue,
                         isPasswordVisible = state.value.isPasswordVisible,
                         onValueChange = {
-                            val maxLength = AppConstants.PASSWORD_MAX_LEN
-                            val text = if (it.length <= maxLength) {
-                                it
-                            } else {
-                                it.take(maxLength)
-                            }
-                            viewModel.onEvent(RegisterEvent.PasswordTextChanged(text))
+                            viewModel.onEvent(RegisterEvent.PasswordTextChanged(it))
                         },
                         onTrailIconPress = {
                             viewModel.onEvent(RegisterEvent.ChangePasswordVisibility)
@@ -175,13 +159,7 @@ fun RegisterScreen(
                         value = state.value.confirmPasswordValue,
                         isPasswordVisible = state.value.isConfirmPasswordVisible,
                         onValueChange = {
-                            val maxLength = AppConstants.USERNAME_MAX_LEN
-                            val text = if (it.length <= maxLength) {
-                                it
-                            } else {
-                                it.take(maxLength)
-                            }
-                            viewModel.onEvent(RegisterEvent.ConfirmPasswordTextChanged(text))
+                            viewModel.onEvent(RegisterEvent.ConfirmPasswordTextChanged(it))
                         },
                         onTrailIconPress = {
                             viewModel.onEvent(RegisterEvent.ChangeConfirmPasswordVisibility)
