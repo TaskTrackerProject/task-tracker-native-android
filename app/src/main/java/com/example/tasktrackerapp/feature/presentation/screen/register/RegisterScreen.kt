@@ -1,5 +1,6 @@
 package com.example.tasktrackerapp.feature.presentation.screen.register
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -49,16 +51,17 @@ fun RegisterScreen(
     navController: NavController,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
-    val state = viewModel.state
+    val state by viewModel.state
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
 
-    if (state.value.showLoading) {
+    if (state.showLoading) {
         LoadingDialog()
     }
 
-    if (state.value.showBasicDialog) {
+    if (state.showBasicDialog) {
         BasicDialog(
-            message = (state.value.dialogMessage.asString(context)),
+            message = (state.dialogMessage.asString(context)),
             onDismiss = {
                 viewModel.onEvent(RegisterEvent.SetBasicDialogVisibility(visible = false))
             },
@@ -86,11 +89,12 @@ fun RegisterScreen(
             )
         },
         content = { innerPadding ->
+            Log.d("TEST", "RECOMPOSING BEGIN")
             Surface(
                 modifier = Modifier
                     .padding(innerPadding)
             ) {
-                val scrollState = rememberScrollState()
+                Log.d("TEST", "RECOMPOSING COLUMNN")
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -98,8 +102,9 @@ fun RegisterScreen(
                         .padding(horizontal = 20.dp, vertical = 10.dp),
                     verticalArrangement = Arrangement.Center,
                 ) {
+                    Log.d("TEST", "RECOMPOSING ITEM BEGIN")
                     NormalTextField(
-                        value = state.value.firstNameValue,
+                        value = state.firstNameValue,
                         onValueChange = {
                             viewModel.onEvent(RegisterEvent.FirstNameTextChanged(it))
                         },
@@ -107,11 +112,11 @@ fun RegisterScreen(
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Text,
                         ),
-                        isValid = state.value.isFirstNameValid,
-                        message = state.value.firstNameMessage.asString(context),
+                        isValid = state.isFirstNameValid,
+                        message = state.firstNameMessage.asString(context),
                     )
                     NormalTextField(
-                        value = state.value.lastNameValue,
+                        value = state.lastNameValue,
                         onValueChange = {
                             viewModel.onEvent(RegisterEvent.LastNameTextChanged(it))
                         },
@@ -119,11 +124,12 @@ fun RegisterScreen(
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Text,
                         ),
-                        isValid = state.value.isLastNameValid,
-                        message = state.value.lastNameMessage.asString(context),
+                        isValid = state.isLastNameValid,
+                        message = state.lastNameMessage.asString(context),
                     )
+                    Log.d("TEST", "RECOMPOSING ITEM MIDDLE")
                     NormalTextField(
-                        value = state.value.emailValue,
+                        value = state.emailValue,
                         onValueChange = {
                             viewModel.onEvent(RegisterEvent.EmailTextChanged(it))
                         },
@@ -131,11 +137,11 @@ fun RegisterScreen(
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Email,
                         ),
-                        isValid = state.value.isEmailValid,
-                        message = state.value.emailMessage.asString(context),
+                        isValid = state.isEmailValid,
+                        message = state.emailMessage.asString(context),
                     )
                     NormalTextField(
-                        value = state.value.usernameValue,
+                        value = state.usernameValue,
                         onValueChange = {
                             viewModel.onEvent(RegisterEvent.UserNameTextChanged(it))
                         },
@@ -143,12 +149,12 @@ fun RegisterScreen(
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Ascii,
                         ),
-                        isValid = state.value.isUserNameValid,
-                        message = state.value.usernameMessage.asString(context),
+                        isValid = state.isUserNameValid,
+                        message = state.usernameMessage.asString(context),
                     )
                     PasswordTextField(
-                        value = state.value.passwordValue,
-                        isPasswordVisible = state.value.isPasswordVisible,
+                        value = state.passwordValue,
+                        isPasswordVisible = state.isPasswordVisible,
                         onValueChange = {
                             viewModel.onEvent(RegisterEvent.PasswordTextChanged(it))
                         },
@@ -156,12 +162,12 @@ fun RegisterScreen(
                             viewModel.onEvent(RegisterEvent.ChangePasswordVisibility)
                         },
                         label = UIText.StringResource(R.string.password).asString(context),
-                        isValid = state.value.isPasswordValid,
-                        message = state.value.passwordMessage.asString(context),
+                        isValid = state.isPasswordValid,
+                        message = state.passwordMessage.asString(context),
                     )
                     PasswordTextField(
-                        value = state.value.confirmPasswordValue,
-                        isPasswordVisible = state.value.isConfirmPasswordVisible,
+                        value = state.confirmPasswordValue,
+                        isPasswordVisible = state.isConfirmPasswordVisible,
                         onValueChange = {
                             viewModel.onEvent(RegisterEvent.ConfirmPasswordTextChanged(it))
                         },
@@ -169,8 +175,8 @@ fun RegisterScreen(
                             viewModel.onEvent(RegisterEvent.ChangeConfirmPasswordVisibility)
                         },
                         label = UIText.StringResource(R.string.confirm_password).asString(context),
-                        isValid = state.value.isConfirmPasswordValid,
-                        message = state.value.confirmPasswordMessage.asString(context),
+                        isValid = state.isConfirmPasswordValid,
+                        message = state.confirmPasswordMessage.asString(context),
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     Button(
@@ -183,6 +189,7 @@ fun RegisterScreen(
                             UIText.StringResource(R.string.register).asString(context).uppercase(),
                         )
                     }
+                    Log.d("TEST", "RECOMPOSING ITEM END")
                 }
             }
         }
