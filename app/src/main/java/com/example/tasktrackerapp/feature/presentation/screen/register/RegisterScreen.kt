@@ -109,22 +109,6 @@ fun RegisterScreen(
         }
     }
 
-    if (showLoading) {
-        LoadingDialog()
-    }
-
-    if (dialogState.showDialog) {
-        BasicDialog(
-            message = (dialogState.dialogMessage.asString()),
-            onDismiss = {
-                viewModel.setBasicDialogState(isVisible = false)
-            },
-            onConfirm = {
-                viewModel.setBasicDialogState(isVisible = false)
-            }
-        )
-    }
-
     Scaffold(
         modifier = Modifier.imePadding(),
         topBar = {
@@ -143,6 +127,20 @@ fun RegisterScreen(
             )
         },
         content = { innerPadding ->
+            if (showLoading) {
+                LoadingDialog()
+            }
+            if (dialogState.showDialog) {
+                BasicDialog(
+                    message = (dialogState.dialogMessage.asString()),
+                    onDismiss = {
+                        viewModel.setBasicDialogState(isVisible = false)
+                    },
+                    onConfirm = {
+                        viewModel.setBasicDialogState(isVisible = false)
+                    }
+                )
+            }
             Surface(
                 modifier = Modifier
                     .padding(innerPadding)

@@ -221,7 +221,7 @@ class RegisterViewModel @Inject constructor(
 
     fun onRegister() {
         viewModelScope.launch {
-            _showLoading.value = false
+            _showLoading.value = true
             if (validate().isSuccess) {
                 val param = UserModel(
                     firstName = _firstNameState.value.value,
