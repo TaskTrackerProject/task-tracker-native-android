@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -51,22 +52,75 @@ fun RegisterScreen(
     navController: NavController,
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
-    val state by viewModel.state
-    val context = LocalContext.current
+    val firstNameState by remember { viewModel.firstNameState }
+    val lastNameState by remember { viewModel.lastNameState }
+    val emailState by remember { viewModel.emailState }
+    val usernameState by remember { viewModel.usernameState }
+    val passwordState by remember { viewModel.passwordState }
+    val confirmPasswordState by remember { viewModel.confirmPasswordState }
+    val showLoading by remember { viewModel.showLoading }
+    val dialogState by remember { viewModel.dialogState }
+    //val context = LocalContext.current
     val scrollState = rememberScrollState()
 
-    if (state.showLoading) {
+    val firstNameChanged = remember<(String) -> Unit> {
+        {
+            viewModel.setFirstNameValue(it)
+        }
+    }
+    val lastNameChanged = remember<(String) -> Unit> {
+        {
+            viewModel.setLastNameValue(it)
+        }
+    }
+    val emailChanged = remember<(String) -> Unit> {
+        {
+            viewModel.setEmailValue(it)
+        }
+    }
+    val usernameChanged = remember<(String) -> Unit> {
+        {
+            viewModel.setUserNameValue(it)
+        }
+    }
+    val passwordChanged = remember<(String) -> Unit> {
+        {
+            viewModel.setPasswordValue(it)
+        }
+    }
+    val passwordVisibilityChanged = remember {
+        {
+            viewModel.changePasswordVisibility()
+        }
+    }
+    val confirmPasswordChanged = remember<(String) -> Unit> {
+        {
+            viewModel.setConfirmPasswordValue(it)
+        }
+    }
+    val confirmPasswordVisibilityChanged = remember {
+        {
+            viewModel.changeConfirmPasswordVisibility()
+        }
+    }
+    val onRegisterClick = remember {
+        {
+            viewModel.onRegister()
+        }
+    }
+
+    if (showLoading) {
         LoadingDialog()
     }
 
-    if (state.showBasicDialog) {
+    if (dialogState.showDialog) {
         BasicDialog(
-            message = (state.dialogMessage.asString(context)),
+            message = (dialogState.dialogMessage.asString()),
             onDismiss = {
-                viewModel.onEvent(RegisterEvent.SetBasicDialogVisibility(visible = false))
+                viewModel.setBasicDialogState(isVisible = false)
             },
             onConfirm = {
-                viewModel.onEvent(RegisterEvent.SetBasicDialogVisibility(visible = false))
+                viewModel.setBasicDialogState(isVisible = false)
             }
         )
     }
@@ -76,7 +130,7 @@ fun RegisterScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = UIText.StringResource(R.string.register).asString(context))
+                    Text(text = UIText.StringResource(R.string.register).asString())
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
@@ -89,12 +143,10 @@ fun RegisterScreen(
             )
         },
         content = { innerPadding ->
-            Log.d("TEST", "RECOMPOSING BEGIN")
             Surface(
                 modifier = Modifier
                     .padding(innerPadding)
             ) {
-                Log.d("TEST", "RECOMPOSING COLUMNN")
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -102,94 +154,73 @@ fun RegisterScreen(
                         .padding(horizontal = 20.dp, vertical = 10.dp),
                     verticalArrangement = Arrangement.Center,
                 ) {
-                    Log.d("TEST", "RECOMPOSING ITEM BEGIN")
                     NormalTextField(
-                        value = state.firstNameValue,
-                        onValueChange = {
-                            viewModel.onEvent(RegisterEvent.FirstNameTextChanged(it))
-                        },
-                        label = UIText.StringResource(R.string.first_name).asString(context),
+                        value = firstNameState.value,
+                        onValueChange = firstNameChanged,
+                        label = UIText.StringResource(R.string.first_name).asString(),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Text,
                         ),
-                        isValid = state.isFirstNameValid,
-                        message = state.firstNameMessage.asString(context),
+                        isValid = firstNameState.isValid,
+                        message = firstNameState.message.asString(),
                     )
                     NormalTextField(
-                        value = state.lastNameValue,
-                        onValueChange = {
-                            viewModel.onEvent(RegisterEvent.LastNameTextChanged(it))
-                        },
-                        label = UIText.StringResource(R.string.last_name).asString(context),
+                        value = lastNameState.value,
+                        onValueChange = lastNameChanged,
+                        label = UIText.StringResource(R.string.last_name).asString(),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Text,
                         ),
-                        isValid = state.isLastNameValid,
-                        message = state.lastNameMessage.asString(context),
+                        isValid = lastNameState.isValid,
+                        message = lastNameState.message.asString(),
                     )
-                    Log.d("TEST", "RECOMPOSING ITEM MIDDLE")
                     NormalTextField(
-                        value = state.emailValue,
-                        onValueChange = {
-                            viewModel.onEvent(RegisterEvent.EmailTextChanged(it))
-                        },
-                        label = UIText.StringResource(R.string.email).asString(context),
+                        value = emailState.value,
+                        onValueChange = emailChanged,
+                        label = UIText.StringResource(R.string.email).asString(),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Email,
                         ),
-                        isValid = state.isEmailValid,
-                        message = state.emailMessage.asString(context),
+                        isValid = emailState.isValid,
+                        message = emailState.message.asString(),
                     )
                     NormalTextField(
-                        value = state.usernameValue,
-                        onValueChange = {
-                            viewModel.onEvent(RegisterEvent.UserNameTextChanged(it))
-                        },
-                        label = UIText.StringResource(R.string.username).asString(context),
+                        value = usernameState.value,
+                        onValueChange = usernameChanged,
+                        label = UIText.StringResource(R.string.username).asString(),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Ascii,
                         ),
-                        isValid = state.isUserNameValid,
-                        message = state.usernameMessage.asString(context),
+                        isValid = usernameState.isValid,
+                        message = usernameState.message.asString(),
                     )
                     PasswordTextField(
-                        value = state.passwordValue,
-                        isPasswordVisible = state.isPasswordVisible,
-                        onValueChange = {
-                            viewModel.onEvent(RegisterEvent.PasswordTextChanged(it))
-                        },
-                        onTrailIconPress = {
-                            viewModel.onEvent(RegisterEvent.ChangePasswordVisibility)
-                        },
-                        label = UIText.StringResource(R.string.password).asString(context),
-                        isValid = state.isPasswordValid,
-                        message = state.passwordMessage.asString(context),
+                        value = passwordState.value,
+                        isPasswordVisible = passwordState.isValueVisible,
+                        onValueChange = passwordChanged,
+                        onTrailIconPress = passwordVisibilityChanged,
+                        label = UIText.StringResource(R.string.password).asString(),
+                        isValid = passwordState.isValid,
+                        message = passwordState.message.asString(),
                     )
                     PasswordTextField(
-                        value = state.confirmPasswordValue,
-                        isPasswordVisible = state.isConfirmPasswordVisible,
-                        onValueChange = {
-                            viewModel.onEvent(RegisterEvent.ConfirmPasswordTextChanged(it))
-                        },
-                        onTrailIconPress = {
-                            viewModel.onEvent(RegisterEvent.ChangeConfirmPasswordVisibility)
-                        },
-                        label = UIText.StringResource(R.string.confirm_password).asString(context),
-                        isValid = state.isConfirmPasswordValid,
-                        message = state.confirmPasswordMessage.asString(context),
+                        value = confirmPasswordState.value,
+                        isPasswordVisible = confirmPasswordState.isValueVisible,
+                        onValueChange = confirmPasswordChanged,
+                        onTrailIconPress = confirmPasswordVisibilityChanged,
+                        label = UIText.StringResource(R.string.confirm_password).asString(),
+                        isValid = confirmPasswordState.isValid,
+                        message = confirmPasswordState.message.asString(),
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            viewModel.onEvent(RegisterEvent.OnRegisterPress)
-                        }
+                        onClick = onRegisterClick,
                     ) {
                         Text(
-                            UIText.StringResource(R.string.register).asString(context).uppercase(),
+                            UIText.StringResource(R.string.register).asString().uppercase(),
                         )
                     }
-                    Log.d("TEST", "RECOMPOSING ITEM END")
                 }
             }
         }

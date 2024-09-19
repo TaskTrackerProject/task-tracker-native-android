@@ -1,5 +1,6 @@
 package com.example.tasktrackerapp.feature.presentation.screen.register
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -13,44 +14,52 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.tasktrackerapp.core.constants.AppConstants
 import com.example.tasktrackerapp.core.model.ResultModel
+import com.example.tasktrackerapp.feature.presentation.screen.register.common.CommonFieldState
+import com.example.tasktrackerapp.feature.presentation.screen.register.common.DialogState
+import com.example.tasktrackerapp.feature.presentation.screen.register.common.PasswordFieldState
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val registerUseCase: RegisterUseCase,
 ) : ViewModel() {
-    private val _state = mutableStateOf(RegisterState())
-    val state: State<RegisterState> = _state
 
-    fun onEvent(event: RegisterEvent) {
-        when (event) {
-            RegisterEvent.ChangeConfirmPasswordVisibility -> changeConfirmPasswordVisibility()
-            RegisterEvent.ChangePasswordVisibility -> changePasswordVisibility()
-            is RegisterEvent.ConfirmPasswordTextChanged -> setConfirmPasswordValue(event.value)
-            is RegisterEvent.EmailTextChanged -> setEmailValue(event.value)
-            is RegisterEvent.FirstNameTextChanged -> setFirstNameValue(event.value)
-            is RegisterEvent.LastNameTextChanged -> setLastNameValue(event.value)
-            RegisterEvent.OnRegisterPress -> onRegister()
-            is RegisterEvent.PasswordTextChanged -> setPasswordValue(event.value)
-            is RegisterEvent.UserNameTextChanged -> setUserNameValue(event.value)
-            is RegisterEvent.SetBasicDialogVisibility -> setBasicDialogState(event.visible)
-        }
-    }
+    private val _firstNameState = mutableStateOf(CommonFieldState())
+    val firstNameState: State<CommonFieldState> = _firstNameState
 
-    private fun changeConfirmPasswordVisibility() {
-        val isVisible = !state.value.isConfirmPasswordVisible
-        _state.value = state.value.copy(
-            isConfirmPasswordVisible = isVisible
+    private val _lastNameState = mutableStateOf(CommonFieldState())
+    val lastNameState: State<CommonFieldState> = _lastNameState
+
+    private val _emailState = mutableStateOf(CommonFieldState())
+    val emailState: State<CommonFieldState> = _emailState
+
+    private val _usernameState = mutableStateOf(CommonFieldState())
+    val usernameState: State<CommonFieldState> = _usernameState
+
+    private val _passwordState = mutableStateOf(PasswordFieldState())
+    val passwordState: State<PasswordFieldState> = _passwordState
+
+    private val _confirmPasswordState = mutableStateOf(PasswordFieldState())
+    val confirmPasswordState: State<PasswordFieldState> = _confirmPasswordState
+
+    private val _showLoading = mutableStateOf(false)
+    val showLoading: State<Boolean> = _showLoading
+
+    private val _dialogState = mutableStateOf(DialogState())
+    val dialogState: State<DialogState> = _dialogState
+
+    fun changeConfirmPasswordVisibility() {
+        _confirmPasswordState.value = confirmPasswordState.value.copy(
+            isValueVisible = !confirmPasswordState.value.isValueVisible
         )
     }
 
-    private fun changePasswordVisibility() {
-        val isVisible = !state.value.isPasswordVisible
-        _state.value = state.value.copy(
-            isPasswordVisible = isVisible,
+    fun changePasswordVisibility() {
+        _passwordState.value = passwordState.value.copy(
+            isValueVisible = !passwordState.value.isValueVisible,
         )
     }
 
-    private fun setConfirmPasswordValue(data: String) {
+    fun setConfirmPasswordValue(data: String) {
         val maxLength = AppConstants.USERNAME_MAX_LEN
         val filteredText = data.filter { it.isLetterOrDigit() }
         val text = if (filteredText.length <= maxLength) {
@@ -58,36 +67,36 @@ class RegisterViewModel @Inject constructor(
         } else {
             filteredText.take(maxLength)
         }
-        _state.value = state.value.copy(
-            confirmPasswordValue = text,
-            isConfirmPasswordValid = true,
+        _confirmPasswordState.value = confirmPasswordState.value.copy(
+            value = text,
+            isValid = true,
         )
     }
 
-    private fun setEmailValue(data: String) {
-        _state.value = state.value.copy(
-            emailValue = data,
-            isEmailValid = true,
+    fun setEmailValue(data: String) {
+        _emailState.value = emailState.value.copy(
+            value = data,
+            isValid = true,
         )
     }
 
-    private fun setFirstNameValue(data: String) {
+    fun setFirstNameValue(data: String) {
         val text = data.filter { it.isLetter() || it.isWhitespace() }
-        _state.value = state.value.copy(
-            firstNameValue = text,
-            isFirstNameValid = true,
+        _firstNameState.value = firstNameState.value.copy(
+            value = text,
+            isValid = true,
         )
     }
 
-    private fun setLastNameValue(data: String) {
+    fun setLastNameValue(data: String) {
         val text = data.filter { it.isLetter() || it.isWhitespace() }
-        _state.value = state.value.copy(
-            lastNameValue = text,
-            isLastNameValid = true,
+        _lastNameState.value = lastNameState.value.copy(
+            value = text,
+            isValid = true,
         )
     }
 
-    private fun setPasswordValue(data: String) {
+    fun setPasswordValue(data: String) {
         val maxLength = AppConstants.PASSWORD_MAX_LEN
         val filteredText = data.filter { it.isLetterOrDigit() }
         val text = if (filteredText.length <= maxLength) {
@@ -95,13 +104,13 @@ class RegisterViewModel @Inject constructor(
         } else {
             filteredText.take(maxLength)
         }
-        _state.value = state.value.copy(
-            passwordValue = text,
-            isPasswordValid = true,
+        _passwordState.value = passwordState.value.copy(
+            value = text,
+            isValid = true,
         )
     }
 
-    private fun setUserNameValue(data: String) {
+    fun setUserNameValue(data: String) {
         val maxLength = AppConstants.USERNAME_MAX_LEN
         val filteredText = data.filter { it.isLetterOrDigit() }
         val text = if (filteredText.length <= maxLength) {
@@ -109,15 +118,15 @@ class RegisterViewModel @Inject constructor(
         } else {
             filteredText.take(maxLength)
         }
-        _state.value = state.value.copy(
-            usernameValue = text,
-            isUserNameValid = true,
+        _usernameState.value = usernameState.value.copy(
+            value = text,
+            isValid = true,
         )
     }
 
-    private fun setBasicDialogState(isVisible: Boolean) {
-        _state.value = state.value.copy(
-            showBasicDialog = isVisible,
+    fun setBasicDialogState(isVisible: Boolean) {
+        _dialogState.value = dialogState.value.copy(
+            showDialog = isVisible,
         )
     }
 
@@ -125,128 +134,123 @@ class RegisterViewModel @Inject constructor(
         var isSuccess = true
 
         val firstNameResult =
-            registerUseCase.validateEmptyField(_state.value.firstNameValue)
+            registerUseCase.validateEmptyField(_firstNameState.value.value)
         if (!firstNameResult.isSuccess) {
             isSuccess = false
-            _state.value = state.value.copy(
-                isFirstNameValid = false,
-                firstNameMessage = firstNameResult.message,
+            _firstNameState.value = firstNameState.value.copy(
+                isValid = false,
+                message = firstNameResult.message,
             )
         } else {
-            _state.value = state.value.copy(
-                isFirstNameValid = true
+            _firstNameState.value = firstNameState.value.copy(
+                isValid = true,
             )
         }
 
         val lastNameResult =
-            registerUseCase.validateEmptyField(_state.value.lastNameValue)
+            registerUseCase.validateEmptyField(_lastNameState.value.value)
         if (!lastNameResult.isSuccess) {
             isSuccess = false
-            _state.value = state.value.copy(
-                isLastNameValid = false,
-                lastNameMessage = lastNameResult.message,
+            _lastNameState.value = lastNameState.value.copy(
+                isValid = false,
+                message = lastNameResult.message,
             )
         } else {
-            _state.value = state.value.copy(
-                isLastNameValid = true
+            _lastNameState.value = lastNameState.value.copy(
+                isValid = true,
             )
         }
 
-        val emailResult = registerUseCase.validateEmail(_state.value.emailValue)
+        val emailResult = registerUseCase.validateEmail(_emailState.value.value)
         if (!emailResult.isSuccess) {
             isSuccess = false
-            _state.value = state.value.copy(
-                isEmailValid = false,
-                emailMessage = emailResult.message,
+            _emailState.value = emailState.value.copy(
+                isValid = false,
+                message = emailResult.message,
             )
         } else {
-            _state.value = state.value.copy(
-                isEmailValid = true
+            _emailState.value = emailState.value.copy(
+                isValid = true,
             )
         }
 
         val usernameResult =
-            registerUseCase.validateEmptyField(_state.value.usernameValue)
+            registerUseCase.validateEmptyField(_usernameState.value.value)
         if (!usernameResult.isSuccess) {
             isSuccess = false
-            _state.value = state.value.copy(
-                isUserNameValid = false,
-                usernameMessage = usernameResult.message,
+            _usernameState.value = usernameState.value.copy(
+                isValid = false,
+                message = usernameResult.message,
             )
         } else {
-            _state.value = state.value.copy(
-                isUserNameValid = true
+            _usernameState.value = usernameState.value.copy(
+                isValid = true,
             )
         }
 
-        val passwordResult = registerUseCase.validatePassword(_state.value.passwordValue)
+        val passwordResult = registerUseCase.validatePassword(_passwordState.value.value)
         if (!passwordResult.isSuccess) {
             isSuccess = false
-            _state.value = state.value.copy(
-                isPasswordValid = false,
-                passwordMessage = passwordResult.message,
+            _passwordState.value = passwordState.value.copy(
+                isValid = false,
+                message = passwordResult.message,
             )
         } else {
-            _state.value = state.value.copy(
-                isPasswordValid = true
+            _passwordState.value = passwordState.value.copy(
+                isValid = true,
             )
         }
 
         val confirmPasswordResult =
             registerUseCase.validateConfirmPassword(
-                _state.value.passwordValue,
-                _state.value.confirmPasswordValue,
+                _passwordState.value.value,
+                _confirmPasswordState.value.value,
             )
         if (!confirmPasswordResult.isSuccess) {
             isSuccess = false
-            _state.value = state.value.copy(
-                isConfirmPasswordValid = false,
-                confirmPasswordMessage = confirmPasswordResult.message,
+            _confirmPasswordState.value = confirmPasswordState.value.copy(
+                isValid = false,
+                message = confirmPasswordResult.message,
             )
         } else {
-            _state.value = state.value.copy(
-                isConfirmPasswordValid = true
+            _confirmPasswordState.value = confirmPasswordState.value.copy(
+                isValid = true,
             )
         }
 
         return ResultModel(isSuccess = isSuccess)
     }
 
-    private fun onRegister() {
+    fun onRegister() {
         viewModelScope.launch {
-            _state.value = state.value.copy(
-                showLoading = true,
-            )
-
+            _showLoading.value = false
             if (validate().isSuccess) {
                 val param = UserModel(
-                    firstName = _state.value.firstNameValue,
-                    lastName = _state.value.lastNameValue,
-                    email = _state.value.emailValue,
-                    userName = _state.value.usernameValue,
-                    password = _state.value.passwordValue,
+                    firstName = _firstNameState.value.value,
+                    lastName = _lastNameState.value.value,
+                    email = _emailState.value.value,
+                    userName = _usernameState.value.value,
+                    password = _passwordState.value.value,
                 )
                 when (val registerResult = registerUseCase.registerUser(param)) {
                     is Either.Left -> {
-                        _state.value = state.value.copy(
-                            showLoading = false,
-                            showBasicDialog = true,
+                        _showLoading.value = false
+                        _dialogState.value = dialogState.value.copy(
+                            showDialog = true,
                             dialogMessage = UIText.DynamicString(registerResult.value),
                         )
                     }
 
                     is Either.Right -> {
-                        _state.value = state.value.copy(
-                            showLoading = false,
-                            showBasicDialog = true,
+                        _showLoading.value = false
+                        _dialogState.value = dialogState.value.copy(
+                            showDialog = true,
                             dialogMessage = registerResult.value.message,
                         )
                     }
                 }
             } else {
-                _state.value = state.value.copy(
-                    showLoading = false,
-                )
+                _showLoading.value = false
             }
         }
     }
