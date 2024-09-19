@@ -61,11 +61,10 @@ class RegisterViewModel @Inject constructor(
 
     fun setConfirmPasswordValue(data: String) {
         val maxLength = AppConstants.USERNAME_MAX_LEN
-        val filteredText = data.filter { it.isLetterOrDigit() }
-        val text = if (filteredText.length <= maxLength) {
-            filteredText
+        val text = if (data.length <= maxLength) {
+            data
         } else {
-            filteredText.take(maxLength)
+            data.take(maxLength)
         }
         _confirmPasswordState.value = confirmPasswordState.value.copy(
             value = text,
@@ -98,11 +97,10 @@ class RegisterViewModel @Inject constructor(
 
     fun setPasswordValue(data: String) {
         val maxLength = AppConstants.PASSWORD_MAX_LEN
-        val filteredText = data.filter { it.isLetterOrDigit() }
-        val text = if (filteredText.length <= maxLength) {
-            filteredText
+        val text = if (data.length <= maxLength) {
+            data
         } else {
-            filteredText.take(maxLength)
+            data.take(maxLength)
         }
         _passwordState.value = passwordState.value.copy(
             value = text,
