@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">TaskTrackerApp</string>
     <string name="register">Register</string>
+    <string name="verify">Verify</string>
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
     <string name="username">Username</string>
@@ -16,4 +17,5 @@
     <string name="password_include_number">Password must include at least 1 number</string>
     <string name="password_include_special_char">Password must include at least 1 special character</string>
     <string name="confirm_pass_not_match">Confirm Password does not matched</string>
+    <string name="back">Back</string>
 </resources>

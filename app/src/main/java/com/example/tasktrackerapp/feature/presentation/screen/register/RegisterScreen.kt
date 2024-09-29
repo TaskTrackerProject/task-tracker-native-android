@@ -22,6 +22,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -42,9 +44,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tasktrackerapp.R
 import com.example.tasktrackerapp.core.constants.AppConstants
+import com.example.tasktrackerapp.core.navigation.Routes
 import com.example.tasktrackerapp.core.utils.UIText
 import com.example.tasktrackerapp.feature.presentation.components.BasicDialog
 import com.example.tasktrackerapp.feature.presentation.components.LoadingDialog
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,8 +64,9 @@ fun RegisterScreen(
     val confirmPasswordState by remember { viewModel.confirmPasswordState }
     val showLoading by remember { viewModel.showLoading }
     val dialogState by remember { viewModel.dialogState }
-    //val context = LocalContext.current
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val firstNameChanged = remember<(String) -> Unit> {
         {
@@ -109,7 +114,30 @@ fun RegisterScreen(
         }
     }
 
+    LaunchedEffect(key1 = true) {
+        viewModel.uiEvents.collectLatest { events ->
+            when(events) {
+                is RegisterViewModel.UIEvents.GoToVerificationPage -> {
+                    //navController.navigate
+                    navController.popBackStack()
+                    navController.navigate(Routes.VERIFICATION)
+                }
+                is RegisterViewModel.UIEvents.ShowFailedSnackBar -> {
+                    snackbarHostState.showSnackbar(
+                        message = events.message.asString(context),
+                    )
+                }
+                is RegisterViewModel.UIEvents.ShowSuccessSnackBar -> {
+                    snackbarHostState.showSnackbar(
+                        message = events.message.asString(context),
+                    )
+                }
+            }
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = Modifier.imePadding(),
         topBar = {
             TopAppBar(
