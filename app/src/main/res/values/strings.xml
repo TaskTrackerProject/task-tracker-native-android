@@ -16,4 +16,8 @@
     <string name="password_include_number">Password must include at least 1 number</string>
     <string name="password_include_special_char">Password must include at least 1 special character</string>
     <string name="confirm_pass_not_match">Confirm Password does not matched</string>
+    <string name="didnt_received_code">Didn\'t received the code?</string>
+    <string name="resend">Resend</string>
+    <string name="verification">Verification</string>
+    <string name="code_sent_to_email">The code has been sent to your email: %1$s</string>
 </resources>

@@ -82,6 +82,8 @@ dependencies {
 
     // Navigation for Compose
     implementation(Dependencies.navigationCompose)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.gson)
 
     // Hilt Navigation Compose integration
     implementation(Dependencies.hiltNavigationCompose)

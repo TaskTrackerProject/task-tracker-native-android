@@ -40,6 +40,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tasktrackerapp.core.navigation.Routes
+import com.example.tasktrackerapp.feature.domain.model.verification.VerificationParamModel
+import com.google.gson.Gson
 
 @Composable
 fun LoginScreen(
@@ -77,8 +79,8 @@ fun LoginScreen(
                     Spacer(modifier = Modifier.height(20.dp))
                     OutlinedTextField(
                         visualTransformation =
-                            if (!state.isPasswordVisible) PasswordVisualTransformation()
-                            else VisualTransformation.None,
+                        if (!state.isPasswordVisible) PasswordVisualTransformation()
+                        else VisualTransformation.None,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
@@ -111,7 +113,7 @@ fun LoginScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable {  },
+                            .clickable { },
                         contentAlignment = Alignment.CenterEnd,
                     ) {
                         Text(
@@ -130,7 +132,17 @@ fun LoginScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { navController.navigate(Routes.REGISTER) },
+                            .clickable {
+                                navController.navigate(Routes.REGISTER)
+//                                val data = VerificationParamModel(
+//                                    id = "TEST",
+//                                    email = "hisefngyukkeb@gmail.com"
+//                                );
+//                                val userJson = Gson().toJson(data)
+//                                navController.navigate(
+//                                    "${Routes.VERIFICATION}/$userJson",
+//                                )
+                            },
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
