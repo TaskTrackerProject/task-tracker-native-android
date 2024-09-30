@@ -39,7 +39,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tasktrackerapp.R
-import com.example.tasktrackerapp.core.navigation.Routes
 import com.example.tasktrackerapp.core.utils.UIText
 import com.example.tasktrackerapp.feature.domain.model.verification.VerificationParamModel
 
@@ -79,7 +78,7 @@ fun VerificationScreen(
                     Text(text = UIText.StringResource(R.string.verify).asString())
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigate(Routes.LOGIN) }) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBackIosNew,
                             contentDescription = "Back",

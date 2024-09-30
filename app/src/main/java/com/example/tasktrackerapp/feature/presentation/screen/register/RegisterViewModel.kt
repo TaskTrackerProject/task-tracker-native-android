@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.tasktrackerapp.core.constants.AppConstants
 import com.example.tasktrackerapp.core.model.ResultModel
+import com.example.tasktrackerapp.feature.domain.model.verification.VerificationParamModel
 import com.example.tasktrackerapp.feature.presentation.screen.register.common.CommonFieldState
 import com.example.tasktrackerapp.feature.presentation.screen.register.common.DialogState
 import com.example.tasktrackerapp.feature.presentation.screen.register.common.PasswordFieldState
@@ -25,8 +26,8 @@ class RegisterViewModel @Inject constructor(
 ) : ViewModel() {
 
     sealed class UIEvents {
-        data object GoToVerificationPage : UIEvents()
-        data class  ShowSuccessSnackBar(val message: UIText) : UIEvents()
+        data class GoToVerificationPage(val data: String) : UIEvents()
+        data class ShowSuccessSnackBar(val message: UIText) : UIEvents()
         data class ShowFailedSnackBar(val message: UIText) : UIEvents()
     }
 
@@ -252,12 +253,16 @@ class RegisterViewModel @Inject constructor(
 
                     is Either.Right -> {
                         _showLoading.value = false
-//                        _dialogState.value = dialogState.value.copy(
-//                            showDialog = true,
-//                            dialogMessage = registerResult.value.message,
-//                        )
                         _uiEvents.emit(UIEvents.ShowSuccessSnackBar(registerResult.value.message))
-                        _uiEvents.emit(UIEvents.GoToVerificationPage)
+
+                        val id = registerResult.value.data ?: ""
+                        val data = registerUseCase.toJson(
+                            VerificationParamModel(
+                                id = id,
+                                email = _emailState.value.value,
+                            ),
+                        )
+                        _uiEvents.emit(UIEvents.GoToVerificationPage(data))
                     }
                 }
             } else {

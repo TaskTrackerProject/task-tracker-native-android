@@ -118,9 +118,8 @@ fun RegisterScreen(
         viewModel.uiEvents.collectLatest { events ->
             when(events) {
                 is RegisterViewModel.UIEvents.GoToVerificationPage -> {
-                    //navController.navigate
                     navController.popBackStack()
-                    navController.navigate(Routes.VERIFICATION)
+                    navController.navigate("${Routes.VERIFICATION}/${events.data}")
                 }
                 is RegisterViewModel.UIEvents.ShowFailedSnackBar -> {
                     snackbarHostState.showSnackbar(

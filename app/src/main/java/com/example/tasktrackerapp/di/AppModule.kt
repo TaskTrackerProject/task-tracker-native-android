@@ -5,13 +5,17 @@ import com.example.tasktrackerapp.feature.data.api.UserService
 import com.example.tasktrackerapp.feature.data.datasource.remote.UserDataSource
 import com.example.tasktrackerapp.feature.data.datasource.remote.UserDataSourceImpl
 import com.example.tasktrackerapp.feature.data.repository.UserRepositoryImpl
+import com.example.tasktrackerapp.feature.data.repository.UtilityRepositoryImpl
 import com.example.tasktrackerapp.feature.domain.repository.UserRepository
+import com.example.tasktrackerapp.feature.domain.repository.UtilityRepository
 import com.example.tasktrackerapp.feature.domain.usecase.ValidateEmptyField
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterUseCase
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterUser
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValidateConfirmPassword
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValidateEmail
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValidatePassword
+import com.example.tasktrackerapp.feature.domain.usecase.utility.ToJson
+import com.google.gson.Gson
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -31,7 +35,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit() : Retrofit {
+    fun provideGson(): Gson {
+        return Gson()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(): Retrofit {
         val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BASIC
         }
@@ -55,31 +65,41 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideUserService(retrofit: Retrofit) : UserService {
+    fun provideUserService(retrofit: Retrofit): UserService {
         return retrofit.create(UserService::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideUserDataSource(userService: UserService) : UserDataSource {
+    fun provideUserDataSource(userService: UserService): UserDataSource {
         return UserDataSourceImpl(userService)
     }
 
     @Provides
     @Singleton
-    fun provideUserRepository(userDataSource: UserDataSource) : UserRepository {
+    fun provideUserRepository(userDataSource: UserDataSource): UserRepository {
         return UserRepositoryImpl(userDataSource)
     }
 
     @Provides
     @Singleton
-    fun provideRegisterScreenUseCase(userRepository: UserRepository) : RegisterUseCase {
+    fun provideUtilityRepository(gson: Gson): UtilityRepository {
+        return UtilityRepositoryImpl(gson)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRegisterScreenUseCase(
+        userRepository: UserRepository,
+        utilityRepository: UtilityRepository,
+    ): RegisterUseCase {
         return RegisterUseCase(
             registerUser = RegisterUser(userRepository),
             validateEmail = RegisterValidateEmail(),
             validatePassword = RegisterValidatePassword(),
             validateConfirmPassword = RegisterValidateConfirmPassword(),
             validateEmptyField = ValidateEmptyField(),
+            toJson = ToJson(utilityRepository),
         )
     }
 }
