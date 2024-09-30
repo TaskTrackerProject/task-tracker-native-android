@@ -1,6 +1,7 @@
 package com.example.tasktrackerapp.feature.data.repository
 
 import com.example.tasktrackerapp.core.model.Either
+import com.example.tasktrackerapp.core.model.FailedModel
 import com.example.tasktrackerapp.feature.data.datasource.remote.UserDataSource
 import com.example.tasktrackerapp.feature.domain.mapper.model.toUserRegisterPayloadEntity
 import com.example.tasktrackerapp.feature.domain.model.UserModel
@@ -12,7 +13,7 @@ import javax.inject.Inject
 class UserRepositoryImpl @Inject constructor(
     private val userDataSource: UserDataSource
 ) : UserRepository {
-    override suspend fun registerUser(user: UserModel): Either<String, SuccessModel<String>> {
+    override suspend fun registerUser(user: UserModel): Either<UIText, SuccessModel<String>> {
         try {
             val payload = user.toUserRegisterPayloadEntity()
             val result = userDataSource.registerUser(payload)
@@ -27,10 +28,10 @@ class UserRepositoryImpl @Inject constructor(
                     ),
                 )
             } else {
-                Either.Left(value = result.body()?.message ?: "Registration failed")
+                Either.Left(UIText.DynamicString(result.body()?.message ?: "Registration failed"))
             }
         } catch (e: Exception) {
-            return Either.Left(value = e.message ?: "Registration failed")
+            return Either.Left(UIText.DynamicString(value = e.message ?: "Registration failed"))
         }
     }
 }

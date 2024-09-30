@@ -1,6 +1,5 @@
 package com.example.tasktrackerapp.feature.presentation.screen.register
 
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -17,11 +16,19 @@ import com.example.tasktrackerapp.core.model.ResultModel
 import com.example.tasktrackerapp.feature.presentation.screen.register.common.CommonFieldState
 import com.example.tasktrackerapp.feature.presentation.screen.register.common.DialogState
 import com.example.tasktrackerapp.feature.presentation.screen.register.common.PasswordFieldState
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val registerUseCase: RegisterUseCase,
 ) : ViewModel() {
+
+    sealed class UIEvents {
+        data object GoToVerificationPage : UIEvents()
+        data class  ShowSuccessSnackBar(val message: UIText) : UIEvents()
+        data class ShowFailedSnackBar(val message: UIText) : UIEvents()
+    }
 
     private val _firstNameState = mutableStateOf(CommonFieldState())
     val firstNameState: State<CommonFieldState> = _firstNameState
@@ -46,6 +53,9 @@ class RegisterViewModel @Inject constructor(
 
     private val _dialogState = mutableStateOf(DialogState())
     val dialogState: State<DialogState> = _dialogState
+
+    private val _uiEvents = MutableSharedFlow<UIEvents>()
+    val uiEvents = _uiEvents.asSharedFlow()
 
     fun changeConfirmPasswordVisibility() {
         _confirmPasswordState.value = confirmPasswordState.value.copy(
@@ -233,18 +243,21 @@ class RegisterViewModel @Inject constructor(
                 when (val registerResult = registerUseCase.registerUser(param)) {
                     is Either.Left -> {
                         _showLoading.value = false
-                        _dialogState.value = dialogState.value.copy(
-                            showDialog = true,
-                            dialogMessage = UIText.DynamicString(registerResult.value),
-                        )
+//                        _dialogState.value = dialogState.value.copy(
+//                            showDialog = true,
+//                            dialogMessage = UIText.DynamicString(registerResult.value),
+//                        )
+                        _uiEvents.emit(UIEvents.ShowFailedSnackBar(registerResult.value));
                     }
 
                     is Either.Right -> {
                         _showLoading.value = false
-                        _dialogState.value = dialogState.value.copy(
-                            showDialog = true,
-                            dialogMessage = registerResult.value.message,
-                        )
+//                        _dialogState.value = dialogState.value.copy(
+//                            showDialog = true,
+//                            dialogMessage = registerResult.value.message,
+//                        )
+                        _uiEvents.emit(UIEvents.ShowSuccessSnackBar(registerResult.value.message))
+                        _uiEvents.emit(UIEvents.GoToVerificationPage)
                     }
                 }
             } else {
