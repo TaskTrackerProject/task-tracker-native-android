@@ -244,10 +244,6 @@ class RegisterViewModel @Inject constructor(
                 when (val registerResult = registerUseCase.registerUser(param)) {
                     is Either.Left -> {
                         _showLoading.value = false
-//                        _dialogState.value = dialogState.value.copy(
-//                            showDialog = true,
-//                            dialogMessage = UIText.DynamicString(registerResult.value),
-//                        )
                         _uiEvents.emit(UIEvents.ShowFailedSnackBar(registerResult.value));
                     }
 
