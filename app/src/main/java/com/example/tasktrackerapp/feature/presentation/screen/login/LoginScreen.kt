@@ -133,15 +133,15 @@ fun LoginScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                navController.navigate(Routes.REGISTER)
-//                                val data = VerificationParamModel(
-//                                    id = "TEST",
-//                                    email = "hisefngyukkeb@gmail.com"
-//                                );
-//                                val userJson = Gson().toJson(data)
-//                                navController.navigate(
-//                                    "${Routes.VERIFICATION}/$userJson",
-//                                )
+                                //navController.navigate(Routes.REGISTER)
+                                val data = VerificationParamModel(
+                                    id = "TEST",
+                                    email = "hisefngyukkeb@gmail.com"
+                                );
+                                val userJson = Gson().toJson(data)
+                                navController.navigate(
+                                    "${Routes.VERIFICATION}/$userJson",
+                                )
                             },
                         contentAlignment = Alignment.Center,
                     ) {

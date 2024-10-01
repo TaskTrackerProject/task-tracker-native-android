@@ -1,6 +1,5 @@
 package com.example.tasktrackerapp.feature.presentation.screen.register
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -43,11 +41,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tasktrackerapp.R
-import com.example.tasktrackerapp.core.constants.AppConstants
 import com.example.tasktrackerapp.core.navigation.Routes
 import com.example.tasktrackerapp.core.utils.UIText
 import com.example.tasktrackerapp.feature.presentation.components.BasicDialog
 import com.example.tasktrackerapp.feature.presentation.components.LoadingDialog
+import com.example.tasktrackerapp.feature.presentation.screen.register.common.RegisterViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -1,4 +1,4 @@
-package com.example.tasktrackerapp.feature.presentation.screen.register
+package com.example.tasktrackerapp.feature.presentation.screen.register.common
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -14,9 +14,6 @@ import javax.inject.Inject
 import com.example.tasktrackerapp.core.constants.AppConstants
 import com.example.tasktrackerapp.core.model.ResultModel
 import com.example.tasktrackerapp.feature.domain.model.verification.VerificationParamModel
-import com.example.tasktrackerapp.feature.presentation.screen.register.common.CommonFieldState
-import com.example.tasktrackerapp.feature.presentation.screen.register.common.DialogState
-import com.example.tasktrackerapp.feature.presentation.screen.register.common.PasswordFieldState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
