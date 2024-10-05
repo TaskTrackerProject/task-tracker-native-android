@@ -8,6 +8,7 @@ import com.example.tasktrackerapp.core.utils.UIText
 import com.example.tasktrackerapp.feature.domain.usecase.verification.VerificationUseCase
 import com.example.tasktrackerapp.feature.presentation.screen.register.common.RegisterViewModel.UIEvents
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -146,14 +147,16 @@ class VerificationViewModel @Inject constructor(
             _state.value = state.value.copy(isLoading = true)
             when(val result = useCase.verifyUser.invoke(userId, otp)) {
                 is Either.Left -> {
+                    _state.value = state.value.copy(isLoading = false)
                     _uiEvents.emit(UIEvents.ShowSnackBar(result.value.message))
                 }
                 is Either.Right -> {
+                    _state.value = state.value.copy(isLoading = false)
                     _uiEvents.emit(UIEvents.ShowToast(result.value.message))
+                    delay(1000)
                     _uiEvents.emit(UIEvents.GoToHomeScreen)
                 }
             }
-            _state.value = state.value.copy(isLoading = false)
         }
     }
 }

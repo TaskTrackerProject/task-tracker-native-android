@@ -56,6 +56,7 @@ import com.example.tasktrackerapp.R
 import com.example.tasktrackerapp.core.navigation.Routes
 import com.example.tasktrackerapp.core.utils.UIText
 import com.example.tasktrackerapp.feature.domain.model.verification.VerificationParamModel
+import com.example.tasktrackerapp.feature.presentation.components.LoadingDialog
 import com.example.tasktrackerapp.feature.presentation.screen.register.common.RegisterViewModel
 import com.example.tasktrackerapp.feature.presentation.screen.verification.common.VerificationViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -153,6 +154,9 @@ fun VerificationScreen(
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
+                if (state.isLoading) {
+                    LoadingDialog()
+                }
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
