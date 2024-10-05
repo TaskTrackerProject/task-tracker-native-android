@@ -14,6 +14,7 @@ import javax.inject.Inject
 import com.example.tasktrackerapp.core.constants.AppConstants
 import com.example.tasktrackerapp.core.model.ResultModel
 import com.example.tasktrackerapp.feature.domain.model.verification.VerificationParamModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
@@ -24,8 +25,8 @@ class RegisterViewModel @Inject constructor(
 
     sealed class UIEvents {
         data class GoToVerificationPage(val data: String) : UIEvents()
-        data class ShowSuccessSnackBar(val message: UIText) : UIEvents()
-        data class ShowFailedSnackBar(val message: UIText) : UIEvents()
+        data class ShowSnackBar(val message: UIText) : UIEvents()
+        data class ShowToast(val message: UIText) : UIEvents()
     }
 
     private val _firstNameState = mutableStateOf(CommonFieldState())
@@ -241,12 +242,13 @@ class RegisterViewModel @Inject constructor(
                 when (val registerResult = registerUseCase.registerUser(param)) {
                     is Either.Left -> {
                         _showLoading.value = false
-                        _uiEvents.emit(UIEvents.ShowFailedSnackBar(registerResult.value));
+                        _uiEvents.emit(UIEvents.ShowSnackBar(registerResult.value));
                     }
 
                     is Either.Right -> {
                         _showLoading.value = false
-                        _uiEvents.emit(UIEvents.ShowSuccessSnackBar(registerResult.value.message))
+                        _uiEvents.emit(UIEvents.ShowToast(registerResult.value.message))
+                        delay(1000)
 
                         val id = registerResult.value.data ?: ""
                         val data = registerUseCase.toJson(

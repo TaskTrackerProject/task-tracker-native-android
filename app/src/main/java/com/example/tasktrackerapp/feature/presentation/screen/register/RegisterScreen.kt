@@ -1,5 +1,6 @@
 package com.example.tasktrackerapp.feature.presentation.screen.register
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -114,20 +115,21 @@ fun RegisterScreen(
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEvents.collectLatest { events ->
-            when(events) {
+            when (events) {
                 is RegisterViewModel.UIEvents.GoToVerificationPage -> {
                     navController.popBackStack()
                     navController.navigate("${Routes.VERIFICATION}/${events.data}")
                 }
-                is RegisterViewModel.UIEvents.ShowFailedSnackBar -> {
+
+                is RegisterViewModel.UIEvents.ShowSnackBar -> {
                     snackbarHostState.showSnackbar(
                         message = events.message.asString(context),
                     )
                 }
-                is RegisterViewModel.UIEvents.ShowSuccessSnackBar -> {
-                    snackbarHostState.showSnackbar(
-                        message = events.message.asString(context),
-                    )
+
+                is RegisterViewModel.UIEvents.ShowToast -> {
+                    Toast.makeText(context, events.message.asString(context), Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }
