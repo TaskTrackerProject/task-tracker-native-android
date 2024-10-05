@@ -1,5 +1,6 @@
 package com.example.tasktrackerapp.feature.presentation.screen.verification
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -26,6 +27,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -40,6 +43,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -63,49 +67,63 @@ fun VerificationScreen(
     data: VerificationParamModel,
     viewModel: VerificationViewModel = hiltViewModel()
 ) {
-    val otpTextChange = remember<(String) -> Unit> {{ viewModel.setOTPData(it) }}
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val otpTextChange = remember<(String) -> Unit> { { viewModel.setOTPData(it) } }
     val otpFieldFocus = remember { FocusRequester() }
-    val field1Click = remember {{
-        otpFieldFocus.requestFocus()
-    }}
-    val field2Click = remember {{
-        otpFieldFocus.requestFocus()
-        viewModel.determineHighLight()
-    }}
-    val field3Click = remember {{
-        otpFieldFocus.requestFocus()
-        viewModel.determineHighLight()
-    }}
-    val field4Click = remember {{
-        otpFieldFocus.requestFocus()
-        viewModel.determineHighLight()
-    }}
+    val field1Click = remember {
+        {
+            otpFieldFocus.requestFocus()
+        }
+    }
+    val field2Click = remember {
+        {
+            otpFieldFocus.requestFocus()
+            viewModel.determineHighLight()
+        }
+    }
+    val field3Click = remember {
+        {
+            otpFieldFocus.requestFocus()
+            viewModel.determineHighLight()
+        }
+    }
+    val field4Click = remember {
+        {
+            otpFieldFocus.requestFocus()
+            viewModel.determineHighLight()
+        }
+    }
     val resendClick = remember {
         Modifier.clickable {
 
         }
     }
-    val onSend = remember {{}}
-
+    val onSend = remember {
+        {
+            viewModel.verify(data.id)
+        }
+    }
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEvents.collectLatest { events ->
             when (events) {
-                is VerificationViewModel.UIEvents.FocusToFirstField -> {
-
+                is VerificationViewModel.UIEvents.ShowSnackBar -> {
+                    snackbarHostState.showSnackbar(
+                        message = events.message.asString(context),
+                    )
                 }
-
-                VerificationViewModel.UIEvents.FocusToFourthField -> {
-
+                is VerificationViewModel.UIEvents.GoToHomeScreen -> {
+                    navController.navigate(Routes.HOME) {
+                        popUpTo(Routes.LOGIN) {
+                            inclusive = true
+                        }
+                    }
                 }
-
-                VerificationViewModel.UIEvents.FocusToSecondField -> {
-
-                }
-
-                VerificationViewModel.UIEvents.FocusToThirdField -> {
-
+                is VerificationViewModel.UIEvents.ShowToast -> {
+                    Toast.makeText(context, events.message.asString(context), Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
         }
@@ -113,6 +131,7 @@ fun VerificationScreen(
 
     Scaffold(
         modifier = Modifier.imePadding(),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {

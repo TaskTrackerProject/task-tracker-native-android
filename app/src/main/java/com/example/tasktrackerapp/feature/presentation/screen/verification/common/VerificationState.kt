@@ -10,4 +10,6 @@ data class VerificationState(
     val field2Highlight: Boolean = false,
     val field3Highlight: Boolean = false,
     val field4Highlight: Boolean = false,
+    val isLoading: Boolean = false,
+
 )

@@ -7,6 +7,7 @@ import com.example.tasktrackerapp.feature.domain.mapper.model.toUserRegisterPayl
 import com.example.tasktrackerapp.feature.domain.model.UserModel
 import com.example.tasktrackerapp.core.model.SuccessModel
 import com.example.tasktrackerapp.core.utils.UIText
+import com.example.tasktrackerapp.feature.domain.entity.remote.user.UserVerifyPayloadEntity
 import com.example.tasktrackerapp.feature.domain.repository.UserRepository
 import javax.inject.Inject
 
@@ -14,24 +15,26 @@ class UserRepositoryImpl @Inject constructor(
     private val userDataSource: UserDataSource
 ) : UserRepository {
     override suspend fun registerUser(user: UserModel): Either<UIText, SuccessModel<String>> {
-        try {
-            val payload = user.toUserRegisterPayloadEntity()
-            val result = userDataSource.registerUser(payload)
-            return if (result.code() == 201 && result.body() != null) {
-                val userId = result.body()?.data?.id ?: ""
-                Either.Right(
-                    value = SuccessModel(
-                        message = UIText.DynamicString(
-                            result.body()!!.message ?: "Registration success"
-                        ),
-                        data = userId,
-                    ),
-                )
-            } else {
-                Either.Left(UIText.DynamicString(result.body()?.message ?: "Registration failed"))
-            }
-        } catch (e: Exception) {
-            return Either.Left(UIText.DynamicString(value = e.message ?: "Registration failed"))
+        val payload = user.toUserRegisterPayloadEntity()
+        val result = userDataSource.registerUser(payload)
+        return if (result.isSuccess) {
+            Either.Right(SuccessModel(message = result.message, data = result.data))
+        }
+        else {
+            Either.Left(result.message)
+        }
+    }
+
+    override suspend fun verifyUser(
+        userId: String,
+        optCode: String
+    ): Either<FailedModel<Any>, SuccessModel<String>> {
+        val payload = UserVerifyPayloadEntity(id = userId, code = optCode)
+        val result = userDataSource.verifyUser(payload)
+        return if (result.isSuccess) {
+            Either.Right(SuccessModel(message = result.message, data = result.data ?: ""))
+        } else {
+            Either.Left(FailedModel(message = result.message))
         }
     }
 }

@@ -15,6 +15,8 @@ import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValida
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValidateEmail
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValidatePassword
 import com.example.tasktrackerapp.feature.domain.usecase.utility.ToJson
+import com.example.tasktrackerapp.feature.domain.usecase.verification.VerificationUseCase
+import com.example.tasktrackerapp.feature.domain.usecase.verification.VerifyUser
 import com.google.gson.Gson
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -100,6 +102,16 @@ object AppModule {
             validateConfirmPassword = RegisterValidateConfirmPassword(),
             validateEmptyField = ValidateEmptyField(),
             toJson = ToJson(utilityRepository),
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideVerificationScreenUseCase(
+        userRepository: UserRepository,
+    ): VerificationUseCase {
+        return VerificationUseCase(
+            verifyUser = VerifyUser(repository = userRepository)
         )
     }
 }

@@ -1,7 +1,11 @@
 package com.example.tasktrackerapp.feature.presentation.screen.verification.common
 
+import androidx.core.app.NotificationCompat.MessagingStyle.Message
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tasktrackerapp.core.model.Either
+import com.example.tasktrackerapp.core.utils.UIText
+import com.example.tasktrackerapp.feature.domain.usecase.verification.VerificationUseCase
 import com.example.tasktrackerapp.feature.presentation.screen.register.common.RegisterViewModel.UIEvents
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,12 +16,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class VerificationViewModel @Inject constructor() : ViewModel() {
+class VerificationViewModel @Inject constructor(
+    private val useCase: VerificationUseCase,
+) : ViewModel() {
     sealed class UIEvents {
-        data object FocusToFirstField : UIEvents()
-        data object FocusToSecondField : UIEvents()
-        data object FocusToThirdField : UIEvents()
-        data object FocusToFourthField : UIEvents()
+        data class ShowSnackBar(val message: UIText) : UIEvents()
+        data class ShowToast(val message: UIText) : UIEvents()
+        data object GoToHomeScreen : UIEvents()
     }
 
     private val _state = MutableStateFlow(VerificationState())
@@ -100,6 +105,7 @@ class VerificationViewModel @Inject constructor() : ViewModel() {
                     fourthFieldVal = "",
                 )
             }
+
             1 -> {
                 _state.value = state.value.copy(
                     firstFieldVal = value.last().toString(),
@@ -108,6 +114,7 @@ class VerificationViewModel @Inject constructor() : ViewModel() {
                     fourthFieldVal = "",
                 )
             }
+
             2 -> {
                 _state.value = state.value.copy(
                     secondFieldVal = value.last().toString(),
@@ -115,12 +122,14 @@ class VerificationViewModel @Inject constructor() : ViewModel() {
                     fourthFieldVal = "",
                 )
             }
+
             3 -> {
                 _state.value = state.value.copy(
                     thirdFieldVal = value.last().toString(),
                     fourthFieldVal = "",
                 )
             }
+
             4 -> {
                 _state.value = state.value.copy(
                     fourthFieldVal = value.last().toString(),
@@ -128,5 +137,23 @@ class VerificationViewModel @Inject constructor() : ViewModel() {
             }
         }
         determineHighLight()
+    }
+
+    fun verify(userId: String) {
+        val otp =
+            _state.value.firstFieldVal + _state.value.secondFieldVal + _state.value.thirdFieldVal + _state.value.fourthFieldVal
+        viewModelScope.launch {
+            _state.value = state.value.copy(isLoading = true)
+            when(val result = useCase.verifyUser.invoke(userId, otp)) {
+                is Either.Left -> {
+                    _uiEvents.emit(UIEvents.ShowSnackBar(result.value.message))
+                }
+                is Either.Right -> {
+                    _uiEvents.emit(UIEvents.ShowToast(result.value.message))
+                    _uiEvents.emit(UIEvents.GoToHomeScreen)
+                }
+            }
+            _state.value = state.value.copy(isLoading = false)
+        }
     }
 }
