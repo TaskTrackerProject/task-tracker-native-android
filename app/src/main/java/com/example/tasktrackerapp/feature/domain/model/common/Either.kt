@@ -1,4 +1,4 @@
-package com.example.tasktrackerapp.core.model
+package com.example.tasktrackerapp.feature.domain.model.common
 
 sealed class Either<out L, out R> {
     data class Left<out L>(val value: L) : Either<L, Nothing>()

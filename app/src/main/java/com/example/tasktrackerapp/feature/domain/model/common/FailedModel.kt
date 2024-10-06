@@ -1,4 +1,4 @@
-package com.example.tasktrackerapp.core.model
+package com.example.tasktrackerapp.feature.domain.model.common
 
 import com.example.tasktrackerapp.core.utils.UIText
 

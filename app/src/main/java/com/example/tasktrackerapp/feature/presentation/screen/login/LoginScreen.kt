@@ -1,7 +1,5 @@
 package com.example.tasktrackerapp.feature.presentation.screen.login
 
-import android.graphics.drawable.Icon
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -27,12 +24,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,15 +38,36 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tasktrackerapp.core.navigation.Routes
-import com.example.tasktrackerapp.feature.domain.model.verification.VerificationParamModel
-import com.google.gson.Gson
+import com.example.tasktrackerapp.feature.presentation.screen.login.common.LoginViewModel
 
 @Composable
 fun LoginScreen(
     navController: NavController,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-    val state = viewModel.state.value
+    val usernameChange = remember<(String) -> Unit> {
+        {
+            viewModel.setUserNameValue(it)
+        }
+    }
+    val passwordChange = remember<(String) -> Unit> {
+        {
+            viewModel.setPasswordValue(it)
+        }
+    }
+    val forgotPasswordClick = remember {
+        Modifier.clickable {
+
+        }
+    }
+    val registerClick = remember {
+        Modifier.clickable {
+            navController.navigate(Routes.REGISTER)
+        }
+    }
+    val loginClick = remember {{ viewModel.onLogin() }}
+    val state by remember { viewModel.state }
+
     Scaffold(
         content = { innerPadding ->
             Surface(
@@ -65,9 +84,7 @@ fun LoginScreen(
                     OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = state.userNameValue,
-                        onValueChange = {
-                            viewModel.onEvent(LoginEvent.UserNameTextChanged(it))
-                        },
+                        onValueChange = usernameChange,
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Person,
@@ -75,6 +92,12 @@ fun LoginScreen(
                             )
                         },
                         singleLine = true,
+                        isError = !state.usernameIsValid,
+                        supportingText = {
+                            if (!state.usernameIsValid) {
+                                Text(text = state.usernameMessage.asString())
+                            }
+                        }
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     OutlinedTextField(
@@ -85,9 +108,7 @@ fun LoginScreen(
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         value = state.passwordValue,
-                        onValueChange = {
-                            viewModel.onEvent(LoginEvent.PasswordTextChanged(it))
-                        },
+                        onValueChange = passwordChange,
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Lock,
@@ -97,7 +118,7 @@ fun LoginScreen(
                         trailingIcon = {
                             IconButton(
                                 onClick = {
-                                    viewModel.onEvent(LoginEvent.ChangePasswordVisibility)
+                                    viewModel.changePasswordVisibility()
                                 }
                             ) {
                                 Icon(
@@ -107,13 +128,17 @@ fun LoginScreen(
                                     contentDescription = "Password",
                                 )
                             }
+                        },
+                        isError = !state.passwordIsValid,
+                        supportingText = {
+                            if (!state.passwordIsValid) {
+                                Text(text = state.passwordMessage.asString())
+                            }
                         }
                     )
                     Spacer(modifier = Modifier.height(15.dp))
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { },
+                        modifier = forgotPasswordClick.fillMaxWidth(),
                         contentAlignment = Alignment.CenterEnd,
                     ) {
                         Text(
@@ -125,24 +150,13 @@ fun LoginScreen(
                     Spacer(modifier = Modifier.height(20.dp))
                     Button(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = { }) {
+                        onClick = loginClick
+                    ) {
                         Text("LOGIN")
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                navController.navigate(Routes.REGISTER)
-//                                val data = VerificationParamModel(
-//                                    id = "TEST",
-//                                    email = "hisefngyukkeb@gmail.com"
-//                                );
-//                                val userJson = Gson().toJson(data)
-//                                navController.navigate(
-//                                    "${Routes.VERIFICATION}/$userJson",
-//                                )
-                            },
+                        modifier = registerClick.fillMaxWidth(),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(

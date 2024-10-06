@@ -1,10 +1,13 @@
 package com.example.tasktrackerapp.feature.data.datasource.remote
 
-import com.example.tasktrackerapp.core.model.ResultModel
+import com.example.tasktrackerapp.feature.domain.model.common.ResultModel
 import com.example.tasktrackerapp.core.utils.UIText
 import com.example.tasktrackerapp.feature.data.api.UserService
+import com.example.tasktrackerapp.feature.domain.entity.remote.user.UserEmailLoginPayloadEntity
 import com.example.tasktrackerapp.feature.domain.entity.remote.user.UserRegisterPayloadEntity
+import com.example.tasktrackerapp.feature.domain.entity.remote.user.UserUsernameLoginPayloadEntity
 import com.example.tasktrackerapp.feature.domain.entity.remote.user.UserVerifyPayloadEntity
+import com.example.tasktrackerapp.feature.domain.model.login.LoginResultModel
 import javax.inject.Inject
 
 class UserDataSourceImpl @Inject constructor(
@@ -69,5 +72,50 @@ class UserDataSourceImpl @Inject constructor(
             isSuccess = false,
             message = UIText.DynamicString("Verification failed")
         )
+    }
+
+    override suspend fun loginViaEmail(payload: UserEmailLoginPayloadEntity): LoginResultModel {
+        try {
+            val result = userService.loginViaEmail(payload)
+            val resultBody = result.body()
+            if (resultBody != null) {
+                val resultStatus = resultBody.status
+                if (resultStatus == "success") {
+                    return LoginResultModel(
+                        isSuccess = true,
+                        message = UIText.DynamicString(
+                            resultBody.message ?: "Login success",
+                        ),
+                        token = result.body()!!.data!!.token,
+                    )
+                } else if (resultStatus == "failed") {
+                    val errors = resultBody.errors ?: emptyList()
+                    if (errors.isNotEmpty()) {
+                        val error = errors[0]
+                        val isNotVerified = error.code == "not_verified"
+                        return LoginResultModel(
+                            isSuccess = false,
+                            message = UIText.DynamicString(
+                                resultBody.message ?: "Login failed",
+                            ),
+                            isNotVerified = isNotVerified,
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            return LoginResultModel(
+                isSuccess = false,
+                message = UIText.DynamicString(e.message ?: "Login failed"),
+            )
+        }
+        return LoginResultModel(
+            isSuccess = false,
+            message = UIText.DynamicString("Login failed"),
+        )
+    }
+
+    override suspend fun loginViaUsername(payload: UserUsernameLoginPayloadEntity): LoginResultModel {
+        TODO("Not yet implemented")
     }
 }

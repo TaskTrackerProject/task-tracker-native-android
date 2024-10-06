@@ -2,7 +2,7 @@ package com.example.tasktrackerapp.feature.domain.usecase.register
 
 import com.example.tasktrackerapp.R
 import com.example.tasktrackerapp.core.constants.AppConstants
-import com.example.tasktrackerapp.core.model.ResultModel
+import com.example.tasktrackerapp.feature.domain.model.common.ResultModel
 import com.example.tasktrackerapp.core.utils.UIText
 
 class RegisterValidatePassword {

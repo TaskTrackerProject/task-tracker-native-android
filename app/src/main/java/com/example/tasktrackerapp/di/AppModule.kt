@@ -9,6 +9,8 @@ import com.example.tasktrackerapp.feature.data.repository.UtilityRepositoryImpl
 import com.example.tasktrackerapp.feature.domain.repository.UserRepository
 import com.example.tasktrackerapp.feature.domain.repository.UtilityRepository
 import com.example.tasktrackerapp.feature.domain.usecase.ValidateEmptyField
+import com.example.tasktrackerapp.feature.domain.usecase.login.Login
+import com.example.tasktrackerapp.feature.domain.usecase.login.LoginUseCase
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterUseCase
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterUser
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValidateConfirmPassword
@@ -112,6 +114,17 @@ object AppModule {
     ): VerificationUseCase {
         return VerificationUseCase(
             verifyUser = VerifyUser(repository = userRepository)
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideLoginUseCase(
+        userRepository: UserRepository
+    ): LoginUseCase {
+        return LoginUseCase(
+            validateEmptyField = ValidateEmptyField(),
+            login = Login(userRepository)
         )
     }
 }

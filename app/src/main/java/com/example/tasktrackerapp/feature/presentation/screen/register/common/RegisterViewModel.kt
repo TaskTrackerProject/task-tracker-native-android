@@ -4,7 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tasktrackerapp.core.model.Either
+import com.example.tasktrackerapp.feature.domain.model.common.Either
 import com.example.tasktrackerapp.core.utils.UIText
 import com.example.tasktrackerapp.feature.domain.model.UserModel
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterUseCase
@@ -12,7 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.tasktrackerapp.core.constants.AppConstants
-import com.example.tasktrackerapp.core.model.ResultModel
+import com.example.tasktrackerapp.feature.domain.model.common.ResultModel
 import com.example.tasktrackerapp.feature.domain.model.verification.VerificationParamModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow

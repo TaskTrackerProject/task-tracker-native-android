@@ -4,4 +4,5 @@ data class CommonResponseEntity<T : Any?>(
     val status: String?,
     val message: String?,
     val data: T? = null,
+    val errors: List<CommonErrorResultEntity>?,
 )

@@ -1,12 +1,10 @@
 package com.example.tasktrackerapp.feature.presentation.screen.verification.common
 
-import androidx.core.app.NotificationCompat.MessagingStyle.Message
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tasktrackerapp.core.model.Either
+import com.example.tasktrackerapp.feature.domain.model.common.Either
 import com.example.tasktrackerapp.core.utils.UIText
 import com.example.tasktrackerapp.feature.domain.usecase.verification.VerificationUseCase
-import com.example.tasktrackerapp.feature.presentation.screen.register.common.RegisterViewModel.UIEvents
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
