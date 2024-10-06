@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tasktrackerapp.core.constants.PrefConstants
 import com.example.tasktrackerapp.core.utils.UIText
 import com.example.tasktrackerapp.feature.domain.model.verification.VerificationParamModel
 import com.example.tasktrackerapp.feature.domain.usecase.login.LoginUseCase
@@ -85,6 +86,8 @@ class LoginViewModel @Inject constructor(
                 isLoading = false,
             )
             if (result.isSuccess) {
+                useCase.prefSaveData(key = PrefConstants.TOKEN_KEY, result.token)
+                useCase.prefSaveData(key = PrefConstants.USER_ID_KEY, result.id)
                 _uiEvents.emit(UIEvents.ShowToast(result.message))
                 delay(1000)
                 _uiEvents.emit(UIEvents.GoToHome)

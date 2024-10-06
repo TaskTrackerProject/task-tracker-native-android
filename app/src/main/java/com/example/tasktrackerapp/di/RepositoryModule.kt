@@ -27,8 +27,11 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideUtilityRepository(gson: Gson): UtilityRepository {
-        return UtilityRepositoryImpl(gson)
+    fun provideUtilityRepository(
+        gson: Gson,
+        sharedPrefDataSource: SharedPrefDataSource,
+    ): UtilityRepository {
+        return UtilityRepositoryImpl(gson, sharedPrefDataSource)
     }
 
 }

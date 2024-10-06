@@ -16,6 +16,7 @@ import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterUser
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValidateConfirmPassword
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValidateEmail
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValidatePassword
+import com.example.tasktrackerapp.feature.domain.usecase.utility.PrefSaveData
 import com.example.tasktrackerapp.feature.domain.usecase.utility.ToJson
 import com.example.tasktrackerapp.feature.domain.usecase.verification.VerificationUseCase
 import com.example.tasktrackerapp.feature.domain.usecase.verification.VerifyUser
@@ -57,9 +58,11 @@ object AppModule {
     @Singleton
     fun provideVerificationScreenUseCase(
         userRepository: UserRepository,
+        utilityRepository: UtilityRepository,
     ): VerificationUseCase {
         return VerificationUseCase(
-            verifyUser = VerifyUser(repository = userRepository)
+            verifyUser = VerifyUser(repository = userRepository),
+            prefSaveData = PrefSaveData(repository = utilityRepository),
         )
     }
 
@@ -73,6 +76,7 @@ object AppModule {
             validateEmptyField = ValidateEmptyField(),
             login = Login(userRepository),
             toJson = ToJson(repository = utilityRepository),
+            prefSaveData = PrefSaveData(repository = utilityRepository),
         )
     }
 }

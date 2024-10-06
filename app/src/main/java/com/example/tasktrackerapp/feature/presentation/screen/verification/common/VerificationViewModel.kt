@@ -2,6 +2,7 @@ package com.example.tasktrackerapp.feature.presentation.screen.verification.comm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tasktrackerapp.core.constants.PrefConstants
 import com.example.tasktrackerapp.feature.domain.model.common.Either
 import com.example.tasktrackerapp.core.utils.UIText
 import com.example.tasktrackerapp.feature.domain.usecase.verification.VerificationUseCase
@@ -143,12 +144,15 @@ class VerificationViewModel @Inject constructor(
             _state.value.firstFieldVal + _state.value.secondFieldVal + _state.value.thirdFieldVal + _state.value.fourthFieldVal
         viewModelScope.launch {
             _state.value = state.value.copy(isLoading = true)
-            when(val result = useCase.verifyUser.invoke(userId, otp)) {
+            when (val result = useCase.verifyUser.invoke(userId, otp)) {
                 is Either.Left -> {
                     _state.value = state.value.copy(isLoading = false)
                     _uiEvents.emit(UIEvents.ShowSnackBar(result.value.message))
                 }
+
                 is Either.Right -> {
+                    useCase.prefSaveData(key = PrefConstants.TOKEN_KEY, result.value.data ?: "")
+                    useCase.prefSaveData(key = PrefConstants.USER_ID_KEY, userId)
                     _state.value = state.value.copy(isLoading = false)
                     _uiEvents.emit(UIEvents.ShowToast(result.value.message))
                     delay(1000)
