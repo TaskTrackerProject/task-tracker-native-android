@@ -2,6 +2,7 @@ package com.example.tasktrackerapp.feature.data.api
 
 import com.example.tasktrackerapp.feature.domain.entity.remote.CommonResponseEntity
 import com.example.tasktrackerapp.feature.domain.entity.remote.user.UserEmailLoginPayloadEntity
+import com.example.tasktrackerapp.feature.domain.entity.remote.user.UserLoginDataResultEntity
 import com.example.tasktrackerapp.feature.domain.entity.remote.user.UserRegisterDataResultEntity
 import com.example.tasktrackerapp.feature.domain.entity.remote.user.UserRegisterPayloadEntity
 import com.example.tasktrackerapp.feature.domain.entity.remote.user.UserTokenDataResultEntity
@@ -19,8 +20,8 @@ interface UserService {
     suspend fun verifyUser(@Body payload: UserVerifyPayloadEntity): Response<CommonResponseEntity<UserTokenDataResultEntity>>
 
     @POST("api/user/login")
-    suspend fun loginViaEmail(@Body payload: UserEmailLoginPayloadEntity): Response<CommonResponseEntity<UserTokenDataResultEntity>>
+    suspend fun loginViaEmail(@Body payload: UserEmailLoginPayloadEntity): Response<CommonResponseEntity<UserLoginDataResultEntity>>
 
     @POST("api/user/login")
-    suspend fun loginViaUsername(@Body payload: UserUsernameLoginPayloadEntity): Response<CommonResponseEntity<UserTokenDataResultEntity>>
+    suspend fun loginViaUsername(@Body payload: UserUsernameLoginPayloadEntity): Response<CommonResponseEntity<UserLoginDataResultEntity>>
 }

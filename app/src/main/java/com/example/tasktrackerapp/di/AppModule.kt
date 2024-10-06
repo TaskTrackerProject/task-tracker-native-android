@@ -75,8 +75,8 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideUserDataSource(userService: UserService): UserDataSource {
-        return UserDataSourceImpl(userService)
+    fun provideUserDataSource(userService: UserService, gson: Gson): UserDataSource {
+        return UserDataSourceImpl(userService, gson)
     }
 
     @Provides
@@ -120,11 +120,13 @@ object AppModule {
     @Provides
     @Singleton
     fun provideLoginUseCase(
-        userRepository: UserRepository
+        userRepository: UserRepository,
+        utilityRepository: UtilityRepository,
     ): LoginUseCase {
         return LoginUseCase(
             validateEmptyField = ValidateEmptyField(),
-            login = Login(userRepository)
+            login = Login(userRepository),
+            toJson = ToJson(repository = utilityRepository),
         )
     }
 }

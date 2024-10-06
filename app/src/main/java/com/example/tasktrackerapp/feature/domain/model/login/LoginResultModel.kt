@@ -7,4 +7,6 @@ data class LoginResultModel(
     val message: UIText = UIText.DynamicString(""),
     val isNotVerified: Boolean = false,
     val token: String = "",
+    val email: String = "",
+    val id: String = "",
 )
