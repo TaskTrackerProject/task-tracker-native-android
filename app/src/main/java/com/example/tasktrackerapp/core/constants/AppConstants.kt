@@ -5,4 +5,5 @@ object AppConstants {
     const val PASSWORD_MIN_LEN = 7
     const val PASSWORD_MAX_LEN = 20
     const val USERNAME_MAX_LEN = 20
+    const val SHARED_PREF_NAME = "task_tracker_pref"
 }

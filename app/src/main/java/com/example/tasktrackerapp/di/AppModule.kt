@@ -3,7 +3,7 @@ package com.example.tasktrackerapp.di
 import com.example.tasktrackerapp.core.constants.AppConstants
 import com.example.tasktrackerapp.feature.data.api.UserService
 import com.example.tasktrackerapp.feature.data.datasource.remote.UserDataSource
-import com.example.tasktrackerapp.feature.data.datasource.remote.UserDataSourceImpl
+import com.example.tasktrackerapp.feature.data.datasource.remote.impl.UserDataSourceImpl
 import com.example.tasktrackerapp.feature.data.repository.UserRepositoryImpl
 import com.example.tasktrackerapp.feature.data.repository.UtilityRepositoryImpl
 import com.example.tasktrackerapp.feature.domain.repository.UserRepository
@@ -36,60 +36,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-    @Provides
-    @Singleton
-    fun provideGson(): Gson {
-        return Gson()
-    }
-
-    @Provides
-    @Singleton
-    fun provideRetrofit(): Retrofit {
-        val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BASIC
-        }
-
-        val httpClient = OkHttpClient().newBuilder().apply {
-            addInterceptor(httpLoggingInterceptor)
-        }
-
-        httpClient.apply {
-            readTimeout(60, TimeUnit.SECONDS)
-        }
-
-        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-
-        return Retrofit.Builder()
-            .baseUrl(AppConstants.APP_BASE_URL)
-            .client(httpClient.build())
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideUserService(retrofit: Retrofit): UserService {
-        return retrofit.create(UserService::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun provideUserDataSource(userService: UserService, gson: Gson): UserDataSource {
-        return UserDataSourceImpl(userService, gson)
-    }
-
-    @Provides
-    @Singleton
-    fun provideUserRepository(userDataSource: UserDataSource): UserRepository {
-        return UserRepositoryImpl(userDataSource)
-    }
-
-    @Provides
-    @Singleton
-    fun provideUtilityRepository(gson: Gson): UtilityRepository {
-        return UtilityRepositoryImpl(gson)
-    }
 
     @Provides
     @Singleton
