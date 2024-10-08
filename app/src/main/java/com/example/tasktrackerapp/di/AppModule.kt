@@ -16,6 +16,8 @@ import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterUser
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValidateConfirmPassword
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValidateEmail
 import com.example.tasktrackerapp.feature.domain.usecase.register.RegisterValidatePassword
+import com.example.tasktrackerapp.feature.domain.usecase.splash.SplashUseCase
+import com.example.tasktrackerapp.feature.domain.usecase.utility.PrefGetData
 import com.example.tasktrackerapp.feature.domain.usecase.utility.PrefSaveData
 import com.example.tasktrackerapp.feature.domain.usecase.utility.ToJson
 import com.example.tasktrackerapp.feature.domain.usecase.verification.VerificationUseCase
@@ -37,6 +39,17 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    @Provides
+    @Singleton
+    fun provideSplashUseCase(
+        utilityRepository: UtilityRepository,
+    ): SplashUseCase {
+        return SplashUseCase(
+            getPrefData = PrefGetData(
+                repository = utilityRepository,
+            )
+        )
+    }
 
     @Provides
     @Singleton

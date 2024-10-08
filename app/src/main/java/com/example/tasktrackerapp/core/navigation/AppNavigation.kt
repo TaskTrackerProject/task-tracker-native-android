@@ -8,13 +8,17 @@ import com.example.tasktrackerapp.feature.domain.model.verification.Verification
 import com.example.tasktrackerapp.feature.presentation.screen.home.HomeScreen
 import com.example.tasktrackerapp.feature.presentation.screen.login.LoginScreen
 import com.example.tasktrackerapp.feature.presentation.screen.register.RegisterScreen
+import com.example.tasktrackerapp.feature.presentation.screen.splash.SplashScreen
 import com.example.tasktrackerapp.feature.presentation.screen.verification.VerificationScreen
 import com.google.gson.Gson
 
 @Composable
 fun AppNavigationGraph() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = Routes.LOGIN) {
+    NavHost(navController = navController, startDestination = Routes.SPLASH) {
+        composable(route = Routes.SPLASH) {
+            SplashScreen(navController = navController)
+        }
         composable(route = Routes.LOGIN) {
             LoginScreen(navController = navController)
         }
