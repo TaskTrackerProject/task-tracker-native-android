@@ -87,6 +87,7 @@ dependencies {
 
     // Hilt Navigation Compose integration
     implementation(Dependencies.hiltNavigationCompose)
+    implementation(libs.androidx.navigation.compose)
 
     //Modules
     implementation(project(Modules.utilities))

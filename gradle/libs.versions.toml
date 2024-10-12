@@ -15,11 +15,13 @@ loggingInterceptor = "4.12.0"
 material = "1.10.0"
 moshi = "1.15.0"
 moshiKotlin = "1.15.0"
+navigationCompose = "2.8.2"
 okhttp = "4.12.0"
 serialization-json = "1.6.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "converterMoshi" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

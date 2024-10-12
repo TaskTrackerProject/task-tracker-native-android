@@ -1,39 +1,49 @@
 package com.example.tasktrackerapp.feature.presentation.screen.home.common
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.tasktrackerapp.R
-import com.example.tasktrackerapp.core.utils.UIText
+import androidx.lifecycle.viewModelScope
+import com.example.tasktrackerapp.feature.presentation.screen.home.navigation.BottomRoutes
+import com.example.tasktrackerapp.feature.presentation.screen.login.common.LoginState
 import com.example.tasktrackerapp.feature.presentation.screen.login.common.LoginViewModel.UIEvents
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor() : ViewModel() {
-    sealed class BottomBarScreen(
-        val route: String,
-        val title: UIText,
-        val icon: ImageVector
-    ) {
-        data object Home : BottomBarScreen(
-            route = "home",
-            title = UIText.StringResource(R.string.home),
-            icon = Icons.Default.Home
-        )
 
-        data object Profile : BottomBarScreen(
-            route = "profile",
-            title = UIText.StringResource(R.string.profile),
-            icon = Icons.Default.Person
-        )
+    sealed class UIEvents {
+        data object GoToProject : UIEvents()
+        data object GoToProfile : UIEvents()
     }
 
-    private val _state = MutableSharedFlow<HomeState>()
-    val state = _state.asSharedFlow()
+    private val _state = mutableStateOf(HomeState())
+    val state: State<HomeState> = _state
+
+    private val _uiEvents = MutableSharedFlow<UIEvents>()
+    val uiEvents = _uiEvents.asSharedFlow()
+
+    fun onProjectClick() {
+        viewModelScope.launch {
+            if (_state.value.currentScreen != BottomRoutes.project) {
+                _state.value = state.value.copy(currentScreen = BottomRoutes.project)
+                _uiEvents.emit(UIEvents.GoToProject)
+            }
+        }
+    }
+
+    fun onProfileClick() {
+        viewModelScope.launch {
+            if (_state.value.currentScreen != BottomRoutes.profile) {
+                _state.value = state.value.copy(currentScreen = BottomRoutes.profile)
+                _uiEvents.emit(UIEvents.GoToProfile)
+            }
+        }
+    }
 }
