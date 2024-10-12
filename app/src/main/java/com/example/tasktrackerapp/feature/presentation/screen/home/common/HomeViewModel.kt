@@ -29,10 +29,20 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     private val _uiEvents = MutableSharedFlow<UIEvents>()
     val uiEvents = _uiEvents.asSharedFlow()
 
+    private fun setSelectedTab(
+        isProjectSelected: Boolean = false,
+        isProfileSelected: Boolean = false,
+    ) {
+        _state.value = state.value.copy(
+            isProjectSelected = isProjectSelected,
+            isProfileSelected = isProfileSelected,
+        )
+    }
+
     fun onProjectClick() {
         viewModelScope.launch {
-            if (_state.value.currentScreen != BottomRoutes.project) {
-                _state.value = state.value.copy(currentScreen = BottomRoutes.project)
+            if (!_state.value.isProjectSelected) {
+                setSelectedTab(isProjectSelected = true)
                 _uiEvents.emit(UIEvents.GoToProject)
             }
         }
@@ -40,8 +50,8 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 
     fun onProfileClick() {
         viewModelScope.launch {
-            if (_state.value.currentScreen != BottomRoutes.profile) {
-                _state.value = state.value.copy(currentScreen = BottomRoutes.profile)
+            if (!_state.value.isProfileSelected) {
+                setSelectedTab(isProfileSelected = true)
                 _uiEvents.emit(UIEvents.GoToProfile)
             }
         }

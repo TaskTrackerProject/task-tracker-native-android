@@ -3,6 +3,8 @@ package com.example.tasktrackerapp.feature.presentation.screen.home
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -23,10 +25,14 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import com.example.tasktrackerapp.R
 import com.example.tasktrackerapp.core.utils.UIText
 import com.example.tasktrackerapp.feature.presentation.screen.home.navigation.BottomRoutes
+import com.example.tasktrackerapp.feature.presentation.screen.profile.ProfileScreen
+import com.example.tasktrackerapp.feature.presentation.screen.project.ProjectScreen
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -34,27 +40,34 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val state by remember { viewModel.state }
-    val navHostController = rememberNavController()
+    //val navHostController = rememberNavController()
+    val pagerState = rememberPagerState(pageCount = { 2 })
 
     val onProjectClick = remember { { viewModel.onProjectClick() } }
     val onProfileClick = remember { { viewModel.onProfileClick() } }
+
+    val homeLabel = remember { UIText.StringResource(R.string.home).asString(context) }
+    val profileLabel = remember { UIText.StringResource(R.string.profile).asString(context) }
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEvents.collectLatest { events ->
             when (events) {
                 is HomeViewModel.UIEvents.GoToProject -> {
-                    navHostController.navigate(BottomRoutes.project) {
-                        popUpTo(navHostController.graph.findStartDestination().id)
-                        launchSingleTop = true
-                    }
+//                    navHostController.navigate(BottomRoutes.project) {
+//                        popUpTo(navHostController.graph.findStartDestination().id)
+//                        launchSingleTop = true
+//                    }
+                    pagerState.scrollToPage(0)
                 }
 
                 is HomeViewModel.UIEvents.GoToProfile -> {
-                    navHostController.navigate(BottomRoutes.profile) {
-                        popUpTo(navHostController.graph.findStartDestination().id)
-                        launchSingleTop = true
-                    }
+//                    navHostController.navigate(BottomRoutes.profile) {
+//                        popUpTo(navHostController.graph.findStartDestination().id)
+//                        launchSingleTop = true
+//                    }
+                    pagerState.scrollToPage(1)
                 }
             }
         }
@@ -67,14 +80,23 @@ fun HomeScreen(
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                HomeBottomBarGraph(navHostController = navHostController)
+                //HomeBottomBarGraph(navHostController = navHostController)
+                HorizontalPager(
+                    state = pagerState,
+                    userScrollEnabled = false
+                ) { page ->
+                    when (page) {
+                        0 -> ProjectScreen()
+                        1 -> ProfileScreen()
+                    }
+                }
             }
         },
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
                     label = {
-                        Text(text = UIText.StringResource(R.string.home).asString())
+                        Text(text = homeLabel)
                     },
                     icon = {
                         Icon(
@@ -82,12 +104,12 @@ fun HomeScreen(
                             contentDescription = "Navigation Icon"
                         )
                     },
-                    selected = state.currentScreen == BottomRoutes.project,
+                    selected = state.isProjectSelected,
                     onClick = onProjectClick,
                 )
                 NavigationBarItem(
                     label = {
-                        Text(text = UIText.StringResource(R.string.profile).asString())
+                        Text(text = profileLabel)
                     },
                     icon = {
                         Icon(
@@ -95,7 +117,7 @@ fun HomeScreen(
                             contentDescription = "Navigation Icon"
                         )
                     },
-                    selected = state.currentScreen == BottomRoutes.profile,
+                    selected = state.isProfileSelected,
                     onClick = onProfileClick,
                 )
             }
