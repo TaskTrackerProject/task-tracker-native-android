@@ -31,4 +31,6 @@
     <string name="profile">Profile</string>
     <string name="my_tasks">My Tasks</string>
     <string name="create">Create</string>
+    <string name="logout">Logout</string>
+    <string name="change_password">Change Password</string>
 </resources>
