@@ -1,13 +1,21 @@
 package com.example.tasktrackerapp.feature.presentation.screen.home
 
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -16,25 +24,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.rememberNavController
-import com.example.tasktrackerapp.feature.presentation.screen.home.navigation.HomeBottomBarGraph
 import com.example.tasktrackerapp.feature.presentation.screen.home.common.HomeViewModel
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.example.tasktrackerapp.R
 import com.example.tasktrackerapp.core.utils.UIText
-import com.example.tasktrackerapp.feature.presentation.screen.home.navigation.BottomRoutes
 import com.example.tasktrackerapp.feature.presentation.screen.profile.ProfileScreen
 import com.example.tasktrackerapp.feature.presentation.screen.project.ProjectScreen
+import com.example.tasktrackerapp.feature.presentation.screen.register.RegisterScreen
 import kotlinx.coroutines.flow.collectLatest
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
@@ -74,6 +83,35 @@ fun HomeScreen(
     }
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = if (state.isProjectSelected) UIText.StringResource(R.string.home)
+                            .asString() else UIText.StringResource(R.string.profile).asString(),
+                    )
+                },
+                actions = {
+                    Button(
+                        modifier = Modifier,
+                        onClick = {
+
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add Icon",
+                            modifier = Modifier.width(20.dp).height(30.dp)
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Text(
+                            UIText.StringResource(R.string.create).asString().uppercase(),
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                }
+            )
+        },
         content = { innerPadding ->
             Surface(
                 modifier = Modifier
@@ -86,8 +124,8 @@ fun HomeScreen(
                     userScrollEnabled = false
                 ) { page ->
                     when (page) {
-                        0 -> ProjectScreen()
-                        1 -> ProfileScreen()
+                        0 -> ProjectScreen(navController)
+                        1 -> ProfileScreen(navController)
                     }
                 }
             }
@@ -123,4 +161,11 @@ fun HomeScreen(
             }
         }
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    val navController = rememberNavController()
+    HomeScreen(navController)
 }
